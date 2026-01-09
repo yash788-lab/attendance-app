@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Mark Attendance - Attendance Tracker{% endblock %}
+
+{% block content %}
+<h2>✓ Mark Attendance</h2>
+
+<form method="GET" style="margin-bottom: 20px;">
+    <div class="form-group" style="max-width: 300px;">
+        <label for="date">Select Date</label>
+        <input type="date" id="date" name="date" value="{{ selected_date.strftime('%Y-%m-%d') }}" onchange="this.form.submit()">
+    </div>
+</form>
+
+{% if students %}
+<form method="POST">
+    <input type="hidden" name="date" value="{{ selected_date.strftime('%Y-%m-%d') }}">
+    
+    <table>
+        <thead>
+            <tr>
+                <th>Roll Number</th>
+                <th>Name</th>
+                <th>Status</th>
+                <th>Remarks</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for student in students %}
+            {% set existing = existing_attendance.get(student.id) %}
+            <tr>
+                <td>{{ student.roll_number }}</td>
+                <td>{{ student.name }}</td>
+                <td>
+                    <select name="status_{{ student.id }}" required>
+                        <option value="">Select...</option>
+                        <option value="present" {% if existing and existing.status == 'present' %}selected{% endif %}>Present</option>
+                        <option value="absent" {% if existing and existing.status == 'absent' %}selected{% endif %}>Absent</option>
+                        <option value="late" {% if existing and existing.status == 'late' %}selected{% endif %}>Late</option>
+                    </select>
+                </td>
+                <td>
+                    <input type="text" name="remarks_{{ student.id }}" 
+                           placeholder="Optional remarks"
+                           value="{{ existing.remarks if existing else '' }}"
+                           style="width: 100%;">
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <div style="margin-top: 20px;">
+        <button type="submit" class="btn">Save Attendance</button>
+    </div>
+</form>
+{% else %}
+<p>No students found. <a href="{{ url_for('main.add_student') }}">Add students</a> first to mark attendance.</p>
+{% endif %}
+{% endblock %}

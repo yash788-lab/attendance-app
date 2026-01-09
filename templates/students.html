@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Students - Attendance Tracker{% endblock %}
+
+{% block content %}
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <h2>👥 Students</h2>
+    <a href="{{ url_for('main.add_student') }}" class="btn">+ Add Student</a>
+</div>
+
+{% if students %}
+<table>
+    <thead>
+        <tr>
+            <th>Roll Number</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for student in students %}
+        <tr>
+            <td>{{ student.roll_number }}</td>
+            <td>{{ student.name }}</td>
+            <td>{{ student.email or '-' }}</td>
+            <td>
+                <a href="{{ url_for('main.delete_student', student_id=student.id) }}" 
+                   class="btn btn-danger" 
+                   onclick="return confirm('Are you sure you want to delete this student?');"
+                   style="padding: 8px 15px; font-size: 14px;">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No students found. <a href="{{ url_for('main.add_student') }}">Add your first student</a> to get started.</p>
+{% endif %}
+{% endblock %}

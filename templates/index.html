@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Attendance Tracker{% endblock %}
+
+{% block content %}
+<h2>📊 Dashboard</h2>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <h3>{{ total_students }}</h3>
+        <p>Total Students</p>
+    </div>
+    <div class="stat-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+        <h3>{{ today_attendance }}</h3>
+        <p>Today's Attendance Marked</p>
+    </div>
+</div>
+
+<h3>Recent Attendance Records</h3>
+{% if recent_records %}
+<table>
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Student</th>
+            <th>Roll Number</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for record in recent_records %}
+        <tr>
+            <td>{{ record.date.strftime('%Y-%m-%d') }}</td>
+            <td>{{ record.student.name }}</td>
+            <td>{{ record.student.roll_number }}</td>
+            <td>
+                {% if record.status == 'present' %}
+                    <span class="percentage high">✓ Present</span>
+                {% elif record.status == 'absent' %}
+                    <span class="percentage low">✗ Absent</span>
+                {% else %}
+                    <span class="percentage medium">⏰ Late</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>No attendance records yet. <a href="{{ url_for('main.mark_attendance') }}">Mark attendance</a> to get started.</p>
+{% endif %}
+{% endblock %}

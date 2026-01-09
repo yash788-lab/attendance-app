@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Reports - Attendance Tracker{% endblock %}
+
+{% block content %}
+<h2>📊 Attendance Reports</h2>
+
+<form method="GET" style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+        <div class="form-group" style="margin-bottom: 0;">
+            <label for="start_date">Start Date</label>
+            <input type="date" id="start_date" name="start_date" value="{{ start_date }}" required>
+        </div>
+        
+        <div class="form-group" style="margin-bottom: 0;">
+            <label for="end_date">End Date</label>
+            <input type="date" id="end_date" name="end_date" value="{{ end_date }}" required>
+        </div>
+        
+        <div style="display: flex; align-items: flex-end; gap: 10px;">
+            <button type="submit" class="btn" style="flex: 1;">Generate Report</button>
+            <a href="{{ url_for('main.export_report', start_date=start_date, end_date=end_date) }}" 
+               class="btn btn-success" style="flex: 1; text-align: center;">📥 Export Excel</a>
+        </div>
+    </div>
+</form>
+
+{% if report_data %}
+<h3>Report Period: {{ start_date }} to {{ end_date }}</h3>
+
+<table>
+    <thead>
+        <tr>
+            <th>Roll Number</th>
+            <th>Name</th>
+            <th>Total Days</th>
+            <th>Present</th>
+            <th>Absent</th>
+            <th>Late</th>
+            <th>Attendance %</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for data in report_data %}
+        <tr>
+            <td>{{ data.student.roll_number }}</td>
+            <td>{{ data.student.name }}</td>
+            <td>{{ data.total_days }}</td>
+            <td><span class="percentage high">{{ data.present_days }}</span></td>
+            <td><span class="percentage low">{{ data.absent_days }}</span></td>
+            <td><span class="percentage medium">{{ data.late_days }}</span></td>
+            <td>
+                {% if data.percentage >= 75 %}
+                    <span class="percentage high">{{ data.percentage }}%</span>
+                {% elif data.percentage >= 50 %}
+                    <span class="percentage medium">{{ data.percentage }}%</span>
+                {% else %}
+                    <span class="percentage low">{{ data.percentage }}%</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>Select a date range to generate the attendance report.</p>
+{% endif %}
+{% endblock %}
