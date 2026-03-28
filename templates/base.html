@@ -5,6 +5,55 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Attendance Tracker{% endblock %}</title>
     <style>
+        .center-box {
+    max-width: 400px;
+    margin: 60px auto;
+    padding: 30px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    text-align: center;
+    animation: fadeIn 0.5s ease-in-out;
+    @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+    }
+}
+
+/* Fix missing password styling */
+input[type="password"] {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+}
+
+input[type="password"]:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+/* Link styling */
+.auth-link {
+    display: block;
+    margin-top: 15px;
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.auth-link:hover {
+    color: #764ba2;
+}
+
+
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #16a34a;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -13,18 +62,46 @@
         
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
+            margin: 0;
             padding: 20px;
+
+            /* 🔥 Background image */
+            background: 
+                radial-gradient(circle at center, rgba(255,255,255,0.95) 40%, rgba(255,255,255,0.6) 70%, rgba(0,0,0,0.4) 100%),
+                url('https://images.unsplash.com/photo-1588072432836-e10032774350');
+
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
         }
         
         .container {
+            position: relative;   /* 🔥 required for overlay */
             max-width: 1200px;
             margin: 0 auto;
-            background: white;
+            background: rgba(255, 255, 255, 0.96);
             border-radius: 15px;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
             overflow: hidden;
+        }
+
+        .container::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+
+            background: url('https://images.unsplash.com/photo-1509062522246-3755977927d7');
+            background-size: cover;
+            background-position: center;
+
+            opacity: 0.17;  /* 🔥 very subtle */
+            z-index: 0;
+        }
+
+        .container > * {
+            position: relative;
+            z-index: 1;
         }
         
         header {
@@ -39,12 +116,16 @@
         }
         
         nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
             background: #f8f9fa;
             padding: 15px 30px;
             border-bottom: 3px solid #667eea;
         }
         
         nav a {
+            display: inline-block;
             color: #667eea;
             text-decoration: none;
             margin-right: 25px;
@@ -54,6 +135,7 @@
         
         nav a:hover {
             color: #764ba2;
+            display: inline-block;
         }
         
         .content {
@@ -80,6 +162,8 @@
         }
         
         .btn {
+            width: 100%;
+            text-align: center;
             display: inline-block;
             padding: 12px 25px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -94,15 +178,21 @@
         }
         
         .btn:hover {
+            width: 100%;
+            text-align: center;
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
         
         .btn-danger {
+            width: 100%;
+            text-align: center;
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
         }
         
         .btn-success {
+            width: 100%;
+            text-align: center;
             background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
         }
         
@@ -110,6 +200,10 @@
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
+        }
+
+        .table-container {
+            overflow-x: auto;
         }
         
         th, td {
@@ -124,9 +218,7 @@
             color: #667eea;
         }
         
-        tr:hover {
-            background: #f8f9fa;
-        }
+        
         
         .form-group {
             margin-bottom: 20px;
@@ -183,6 +275,41 @@
             font-size: 1.1em;
             opacity: 0.9;
         }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-header h2 {
+            margin: 0;
+        }
+
+        body, .container, nav, table, th, td, input, select, textarea {
+            transition: all 1s ease;
+        }
+
+        tr {
+            transition: background 0.25s ease, transform 0.15s ease;
+        }
+
+        tr:hover {
+            transform: scale(1.01);
+        }
+
+        @media (max-width: 600px) {
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .page-header .btn {
+                width: auto;
+                white-space: nowrap;
+            }
+        }
         
         .percentage {
             font-weight: 700;
@@ -190,6 +317,14 @@
             border-radius: 5px;
             display: inline-block;
         }
+
+        .dashboard-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 400px;
+            margin: 30px auto;
+}
         
         .percentage.high {
             background: #d4edda;
@@ -205,22 +340,151 @@
             background: #f8d7da;
             color: #721c24;
         }
+
+        body.dark-mode {
+            background: #121212;
+        }
+
+        body.dark-mode .container {
+            background: rgba(30, 30, 30, 0.95);
+            color: #f1f1f1;
+        }
+
+        
+        body.dark-mode .center-box h2 {
+            color: #ffffff !important;
+        }
+
+        body.dark-mode .center-box {
+            background: rgba(20, 20, 20, 0.95);
+            color: #ffffff;
+        }
+
+        body.dark-mode .center-box label {
+            color: #dddddd;
+        }
+
+        body.dark-mode .center-box input {
+            background: #2c2c2c;
+            color: #ffffff;
+            border: 1px solid #555;
+        }
+
+        body.dark-mode nav {
+            background: #1e1e1e;
+        }
+
+        body.dark-mode th {
+            background: #2c2c2c;
+            color: #fff;
+        }
+
+        body.dark-mode td {
+            border-color: #444;
+        }
+
+        body.dark-mode input,
+        body.dark-mode select,
+        body.dark-mode textarea {
+            background: #2c2c2c;
+            color: #fff;
+            border: 1px solid #555;
+        }
+
+        body.dark-mode .percentage.high {
+            background: #1e4620;
+            color: #7CFC00;
+        }
+
+        body.dark-mode .percentage.medium {
+            background: #4a3b00;
+            color: #ffd966;
+        }
+
+        body.dark-mode .percentage.low {
+            background: #4a1e1e;
+            color: #ff6b6b;
+        }
+
+        .dark-toggle {
+            margin-left: auto;
+            
+            width: 40px;
+            height: 40px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border: none;
+            border-radius: 8px;
+
+            cursor: pointer;
+            font-size: 18px;
+
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .dark-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+
     </style>
 </head>
+<script>
+function toggleDarkMode() {
+    document.body.classList.toggle("dark-mode");
+
+    // save preference
+    if (document.body.classList.contains("dark-mode")) {
+        localStorage.setItem("theme", "dark");
+    } else {
+        localStorage.setItem("theme", "light");
+    }
+}
+
+// load saved theme
+window.onload = function () {
+    if (localStorage.getItem("theme") === "dark") {
+        document.body.classList.add("dark-mode");
+    }
+}
+</script>
 <body>
     <div class="container">
         <header>
-            <h1>📚 Attendance Tracking System</h1>
-            <p>Manage student attendance with ease</p>
+            <h1>Attendance Tracking </h1>
+            <p></p>
         </header>
         
-        <nav>
-            <a href="{{ url_for('main.index') }}">🏠 Dashboard</a>
-            <a href="{{ url_for('main.students') }}">👥 Students</a>
-            <a href="{{ url_for('main.mark_attendance') }}">✓ Mark Attendance</a>
-            <a href="{{ url_for('main.view_attendance') }}">📋 View Records</a>
-            <a href="{{ url_for('main.reports') }}">📊 Reports</a>
-        </nav>
+<nav>
+<button onclick="toggleDarkMode()" class="dark-toggle">
+    🌙
+</button>
+{% if current_user.is_authenticated %}
+
+    <a href="{{ url_for('main.index') }}">🏠 Dashboard</a>
+
+    {% if current_user.is_authenticated and current_user.role == 'teacher' %}
+        <a href="{{ url_for('main.students') }}">👥 Students</a>
+        <a href="{{ url_for('main.mark_attendance') }}">✓ Mark Attendance</a>
+        <a href="{{ url_for('main.view_attendance') }}">📋 View Records</a>
+    {% endif %}
+
+    {% if current_user.role == 'student' %}
+        <a href="{{ url_for('main.view_attendance') }}">📋 My Attendance</a>
+    {% endif %}
+
+    <a href="{{ url_for('main.logout') }}">🚪 Logout</a>
+
+{% endif %}
+
+</nav>
         
         <div class="content">
             {% with messages = get_flashed_messages(with_categories=true) %}

@@ -7,18 +7,32 @@
 
 <form method="GET" style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
-        <div class="form-group" style="margin-bottom: 0;">
-            <label for="student_id">Student</label>
-            <select id="student_id" name="student_id">
-                <option value="">All Students</option>
-                {% for student in students %}
-                <option value="{{ student.id }}" {% if selected_student_id == student.id %}selected{% endif %}>
-                    {{ student.name }} ({{ student.roll_number }})
-                </option>
+        
+        {% if current_user.role == 'teacher' %}
+        <div class="form-group">
+            <label for="class_id">Class</label>
+            <select name="class_id" id="class_id">
+                <option value="">All Classes</option>
+                {% for cls in classes %}
+                    <option value="{{ cls.id }}" {% if request.args.get('class_id') == cls.id|string %}selected{% endif %}>
+                        {{ cls.name }}
+                    </option>
                 {% endfor %}
             </select>
         </div>
-        
+
+        <div class="form-group">
+            <label for="student_id">Student</label>
+            <select name="student_id" id="student_id">
+                <option value="">All Students</option> {% for student in students %}
+                    <option value="{{ student.id }}" {% if request.args.get('student_id') == student.id|string %}selected{% endif %}>
+                        {{ student.name }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        {% endif %}
+
         <div class="form-group" style="margin-bottom: 0;">
             <label for="start_date">Start Date</label>
             <input type="date" id="start_date" name="start_date" value="{{ start_date or '' }}">
@@ -34,14 +48,16 @@
         </div>
     </div>
 </form>
-
 {% if records %}
+<div class="table-container">
 <table>
     <thead>
         <tr>
             <th>Date</th>
+            {% if current_user.role == 'teacher' %}
             <th>Roll Number</th>
             <th>Student Name</th>
+            {% endif %}
             <th>Status</th>
             <th>Remarks</th>
         </tr>
@@ -50,8 +66,10 @@
         {% for record in records %}
         <tr>
             <td>{{ record.date.strftime('%Y-%m-%d') }}</td>
+            {% if current_user.role == 'teacher' %}
             <td>{{ record.student.roll_number }}</td>
             <td>{{ record.student.name }}</td>
+            {% endif %}
             <td>
                 {% if record.status == 'present' %}
                     <span class="percentage high">✓ Present</span>
@@ -66,6 +84,7 @@
         {% endfor %}
     </tbody>
 </table>
+</div>
 {% else %}
 <p>No attendance records found for the selected filters.</p>
 {% endif %}

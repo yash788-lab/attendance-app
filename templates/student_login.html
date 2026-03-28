@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Login{% endblock %}
+
+{% block content %}
+<div class="center-box">
+    <h2>🎓 Student Login</h2>
+
+<form method="POST">
+
+    <label>Class</label>
+    <select name="class_id" required>
+        <option value="">Select Class</option>
+        {% for cls in classes %}
+            <option value="{{ cls.id }}">{{ cls.name }}</option>
+        {% endfor %}
+    </select>
+
+    <label>Roll Number</label>
+    <input type="text" name="roll_number" required>
+
+    <label>Password</label>
+    <input type="email" name="email" required>
+
+    <button type="submit" class="btn">Login</button>
+
+</form>
+
+    <a href="{{ url_for('main.admin_login') }}" class="auth-link">
+        Login as Teacher
+    </a>
+</div>
+{% endblock %}

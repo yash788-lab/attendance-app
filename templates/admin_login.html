@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}Teacher Login{% endblock %}
+
+{% block content %}
+<div class="center-box">
+    <h2>Teacher Login</h2>
+
+    <form method="POST">
+        <div class="form-group">
+            <input type="password" name="password" placeholder="Enter Admin Key" required>
+        </div>
+
+        <button type="submit" class="btn">Login</button>
+    </form>
+
+    <a href="{{ url_for('main.login') }}" class="auth-link">
+        Login as Student
+    </a>
+</div>
+{% endblock %}

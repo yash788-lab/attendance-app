@@ -6,9 +6,21 @@
 <h2>➕ Add New Student</h2>
 
 <form method="POST" style="max-width: 600px;">
+
     <div class="form-group">
         <label for="name">Name *</label>
         <input type="text" id="name" name="name" required>
+    </div>
+
+    <!-- ✅ NEW FIELD -->
+    <div class="form-group">
+    <label for="class_id">Class *</label>
+    <select id="class_id" name="class_id" required>
+        <option value="">Select Class</option>
+        {% for cls in classes %}
+            <option value="{{ cls.id }}">{{ cls.name }}</option>
+        {% endfor %}
+    </select>
     </div>
     
     <div class="form-group">
@@ -16,9 +28,10 @@
         <input type="text" id="roll_number" name="roll_number" required>
     </div>
     
+    <!-- ✅ NOW REQUIRED -->
     <div class="form-group">
-        <label for="email">Email</label>
-        <input type="email" id="email" name="email">
+        <label for="email">Email (used as password) *</label>
+        <input type="email" id="email" name="email" required>
     </div>
     
     <div style="display: flex; gap: 10px;">

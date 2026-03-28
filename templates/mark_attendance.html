@@ -3,19 +3,38 @@
 {% block title %}Mark Attendance - Attendance Tracker{% endblock %}
 
 {% block content %}
+
+
 <h2>✓ Mark Attendance</h2>
 
-<form method="GET" style="margin-bottom: 20px;">
-    <div class="form-group" style="max-width: 300px;">
+<form method="GET" style="margin-bottom: 20px; display: flex; gap: 20px; background: #f8f9fa; padding: 15px; border-radius: 8px;">
+    
+    <div class="form-group" style="max-width: 300px; flex: 1;">
         <label for="date">Select Date</label>
-        <input type="date" id="date" name="date" value="{{ selected_date.strftime('%Y-%m-%d') }}" onchange="this.form.submit()">
+        <input type="date" id="date" name="date" 
+               value="{{ selected_date.strftime('%Y-%m-%d') }}" 
+               onchange="this.form.submit()">
     </div>
+
+    <div class="form-group" style="max-width: 300px; flex: 1;">
+        <label for="class_id">Select Class</label>
+        <select name="class_id" id="class_id" onchange="this.form.submit()">
+            <option value="">-- All Classes --</option>
+            {% for cls in classes %}
+                <option value="{{ cls.id }}"
+                    {% if selected_class_id == cls.id|string or selected_class_id == cls.id %}selected{% endif %}>
+                    {{ cls.name }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+
 </form>
 
 {% if students %}
 <form method="POST">
     <input type="hidden" name="date" value="{{ selected_date.strftime('%Y-%m-%d') }}">
-    
+    <div class="table-container">
     <table>
         <thead>
             <tr>
@@ -49,6 +68,7 @@
             {% endfor %}
         </tbody>
     </table>
+    </div>
     
     <div style="margin-top: 20px;">
         <button type="submit" class="btn">Save Attendance</button>
