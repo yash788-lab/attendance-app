@@ -1,21 +1,13 @@
 from flask import Flask, redirect, url_for, session
 from config import Config
 from database import db
-from flask_login import LoginManager, UserMixin, current_user, logout_user
+from flask_login import LoginManager, current_user, logout_user
 from models import Student, Class
 from datetime import timedelta
+from auth import User, TEACHER_ID
 import time
 
 login_manager = LoginManager()
-
-# 👤 User class
-class User(UserMixin):
-    def __init__(self, id, role):
-        self.id = str(id)
-        self.role = role
-
-    def get_id(self):
-        return self.id
 
 
 def create_app():
@@ -91,12 +83,16 @@ def load_user(user_id):
     if user_id == TEACHER_ID:
         return User(id=TEACHER_ID, role='teacher')
 
-    student = Student.query.get(user_id)
+    student = db.session.get(Student, user_id)
     if student:
         return User(id=student.id, role='student')
 
     return None
 
 app = create_app()
+
+import os
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)

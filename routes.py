@@ -3,7 +3,7 @@ from database import db
 from models import Student, Attendance, Class
 from datetime import datetime, date
 from flask_login import current_user, login_user, logout_user, login_required
-from app import User, TEACHER_ID  # ✅ IMPORTANT
+from auth import User, TEACHER_ID  # ✅ IMPORTANT
 from functools import wraps
 
 main = Blueprint('main', __name__)
@@ -11,8 +11,7 @@ main = Blueprint('main', __name__)
 # ✅ ADMIN KEYS
 ADMIN_KEYS = ['12345678', '87654321', '11223344']
 
-# ✅ SAFE TEACHER ID (must match app.py)
-TEACHER_ID = -1
+
 
 
 # =========================
