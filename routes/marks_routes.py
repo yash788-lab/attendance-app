@@ -63,3 +63,9 @@ def manage_marks():
         flash("Marks updated!", "success")
 
     return render_template('manage_marks.html', **locals())
+
+@main.route('/marks/student')
+@login_required
+def student_marks():
+    # To be implemented later. Render dummy for now to satisfy url_for
+    return "<h1>Student Marks Coming Soon</h1>"
