@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <title>{% block title %}SMS Dashboard{% endblock %}</title>
     <style>
         /* =========================
@@ -38,7 +40,7 @@
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Segoe UI', system-ui, sans-serif;
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-main);
             transition: background 0.3s ease;
@@ -117,16 +119,27 @@
             width: calc(100% - var(--sidebar-width));
         }
 
-        /* Fixed Selector for Top Bar */
-        .top-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            background: var(--sidebar-bg);
-            padding: 15px 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+        /* Floating Theme Toggle */
+        .theme-float {
+            position: fixed;
+            top: 20px;
+            right: 24px;
+            z-index: 200;
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.3rem;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            line-height: 1;
+        }
+        .theme-float:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.25);
         }
 
         /* =========================
@@ -144,7 +157,12 @@
             display: inline-block;
             transition: transform 0.2s;
         }
+        .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3); }
         .btn:active { transform: scale(0.98); }
+
+        /* Table row hover */
+        tbody tr { transition: background 0.2s ease; }
+        tbody tr:hover { background: rgba(102, 126, 234, 0.04); }
 
         .dark-toggle {
             background: none;
@@ -210,8 +228,7 @@
     <div class="app-wrapper">
         <aside class="sidebar">
             <div class="sidebar-header">
-                <h2>SMS PORTAL</h2>
-                <p style="font-size: 0.7rem; opacity: 0.8;">Student Management System</p>
+                <h2 style="font-size: 1rem; line-height: 1.4;">Student<br>Management System</h2>
             </div>
             
             <nav class="sidebar-nav">
@@ -237,22 +254,12 @@
             </nav>
         </aside>
 
+        <!-- Floating Dark Mode Toggle -->
+        <button onclick="toggleDarkMode()" class="theme-float" title="Toggle theme">
+            <span id="theme-icon">🌙</span>
+        </button>
+
         <main class="main-content">
-            <div class="top-bar">
-                <div style="display: flex; align-items: center; gap: 15px;">
-                    <h3 id="page-title">{% block heading %}Welcome{% endblock %}</h3>
-                </div>
-                <div style="display: flex; align-items: center; gap: 15px;">
-                    <button onclick="toggleDarkMode()" class="dark-toggle">
-                        <span id="theme-icon">🌙</span>
-                    </button>
-                    {% if current_user.is_authenticated %}
-                        <span style="font-size: 0.9rem;">
-                            <strong>{{ current_user.name }}</strong> ({{ current_user.role|capitalize }})
-                        </span>
-                    {% endif %}
-                </div>
-            </div>
 
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
