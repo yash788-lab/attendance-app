@@ -17,4 +17,4 @@ def index():
         (Notification.student_id == None)
     ).order_by(Notification.timestamp.desc()).limit(3).all()
 
-    return "<h1>Working</h1>"
+    return render_template('student_dashboard.html', student=student, att_percent=att_percent, notifs=notifs)
