@@ -1,0 +1,5 @@
+{% macro alert(message, category="success") %}
+<div class="alert alert-{{ category }}">
+    {{ message }}
+</div>
+{% endmacro %}

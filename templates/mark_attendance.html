@@ -1,24 +1,25 @@
 {% extends "base.html" %}
+{# Import the card macro #}
+{% from "components/card.html" import render_card %}
 
 {% block title %}Mark Attendance - Attendance Tracker{% endblock %}
 
 {% block content %}
-
-
 <h2>✓ Mark Attendance</h2>
 
-<form method="GET" style="margin-bottom: 20px; display: flex; gap: 20px; background: #f8f9fa; padding: 15px; border-radius: 8px;">
+{% call render_card("Select Date & Class") %}
+<form method="GET" style="margin-bottom: 0; display: flex; gap: 20px; flex-wrap: wrap;">
     
-    <div class="form-group" style="max-width: 300px; flex: 1;">
+    <div class="form-group" style="min-width: 200px; flex: 1;">
         <label for="date">Select Date</label>
-        <input type="date" id="date" name="date" 
+        <input type="date" id="date" name="date" class="form-control"
                value="{{ selected_date.strftime('%Y-%m-%d') }}" 
                onchange="this.form.submit()">
     </div>
 
-    <div class="form-group" style="max-width: 300px; flex: 1;">
+    <div class="form-group" style="min-width: 200px; flex: 1;">
         <label for="class_id">Select Class</label>
-        <select name="class_id" id="class_id" onchange="this.form.submit()">
+        <select name="class_id" id="class_id" class="form-control" onchange="this.form.submit()">
             <option value="">-- All Classes --</option>
             {% for cls in classes %}
                 <option value="{{ cls.id }}"
@@ -30,51 +31,59 @@
     </div>
 
 </form>
+{% endcall %}
 
-{% if students %}
-<form method="POST">
-    <input type="hidden" name="date" value="{{ selected_date.strftime('%Y-%m-%d') }}">
-    <div class="table-container">
-    <table>
-        <thead>
-            <tr>
-                <th>Roll Number</th>
-                <th>Name</th>
-                <th>Status</th>
-                <th>Remarks</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for student in students %}
-            {% set existing = existing_attendance.get(student.id) %}
-            <tr>
-                <td>{{ student.roll_number }}</td>
-                <td>{{ student.name }}</td>
-                <td>
-                    <select name="status_{{ student.id }}" required>
-                        <option value="">Select...</option>
-                        <option value="present" {% if existing and existing.status == 'present' %}selected{% endif %}>Present</option>
-                        <option value="absent" {% if existing and existing.status == 'absent' %}selected{% endif %}>Absent</option>
-                        <option value="late" {% if existing and existing.status == 'late' %}selected{% endif %}>Late</option>
-                    </select>
-                </td>
-                <td>
-                    <input type="text" name="remarks_{{ student.id }}" 
-                           placeholder="Optional remarks"
-                           value="{{ existing.remarks if existing else '' }}"
-                           style="width: 100%;">
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    </div>
-    
-    <div style="margin-top: 20px;">
-        <button type="submit" class="btn">Save Attendance</button>
-    </div>
-</form>
-{% else %}
-<p>No students found. <a href="{{ url_for('main.add_student') }}">Add students</a> first to mark attendance.</p>
-{% endif %}
+{% call render_card("Student List") %}
+    {% if students %}
+    <form method="POST">
+        <input type="hidden" name="date" value="{{ selected_date.strftime('%Y-%m-%d') }}">
+        
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Roll Number</th>
+                        <th>Name</th>
+                        <th style="width: 150px;">Status</th>
+                        <th>Remarks</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                    {% set existing = existing_attendance.get(student.id) %}
+                    <tr>
+                        <td>{{ student.roll_number }}</td>
+                        <td><strong>{{ student.name }}</strong></td>
+                        <td>
+                            <select name="status_{{ student.id }}" class="form-control" required>
+                                <option value="">Select...</option>
+                                <option value="present" {% if existing and existing.status == 'present' %}selected{% endif %}>Present</option>
+                                <option value="absent" {% if existing and existing.status == 'absent' %}selected{% endif %}>Absent</option>
+                                <option value="late" {% if existing and existing.status == 'late' %}selected{% endif %}>Late</option>
+                            </select>
+                        </td>
+                        <td>
+                            <input type="text" name="remarks_{{ student.id }}" class="form-control"
+                                   placeholder="Optional remarks"
+                                   value="{{ existing.remarks if existing else '' }}">
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <div style="margin-top: 25px; text-align: right;">
+            <button type="submit" class="btn btn-success" style="padding: 12px 30px;">
+                💾 Save Attendance
+            </button>
+        </div>
+    </form>
+    {% else %}
+        <p style="margin: 0; color: #666;">
+            No students found. <a href="{{ url_for('main.add_student') }}">Add students</a> first to mark attendance.
+        </p>
+    {% endif %}
+{% endcall %}
+
 {% endblock %}

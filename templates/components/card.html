@@ -1,0 +1,8 @@
+{% macro render_card(title) %}
+<div class="card" style="padding: 24px; margin-bottom: 24px; background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid var(--glass-border); border-radius: 16px; box-shadow: var(--card-shadow); transition: transform 0.3s ease, box-shadow 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 12px 40px 0 rgba(31, 38, 135, 0.15)';" onmouseout="this.style.transform='none'; this.style.boxShadow='var(--card-shadow)';">
+    <h4 style="margin-top: 0; margin-bottom: 20px; font-size: 1.25rem; font-weight: 600; color: var(--text-main); border-bottom: 2px solid rgba(102, 126, 234, 0.1); padding-bottom: 10px;">{{ title }}</h4>
+    <div style="position: relative; z-index: 1;">
+        {{ caller() }}
+    </div>
+</div>
+{% endmacro %}

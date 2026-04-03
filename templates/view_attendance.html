@@ -1,11 +1,14 @@
 {% extends "base.html" %}
+{# Import the macro from the subfolder #}
+{% from "components/card.html" import render_card %}
 
 {% block title %}View Attendance - Attendance Tracker{% endblock %}
 
 {% block content %}
 <h2>📋 Attendance Records</h2>
 
-<form method="GET" style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+{% call render_card("Filter Records") %}
+<form method="GET" style="margin-bottom: 0;">
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
         
         {% if current_user.role == 'teacher' %}
@@ -24,7 +27,8 @@
         <div class="form-group">
             <label for="student_id">Student</label>
             <select name="student_id" id="student_id">
-                <option value="">All Students</option> {% for student in students %}
+                <option value="">All Students</option> 
+                {% for student in students %}
                     <option value="{{ student.id }}" {% if request.args.get('student_id') == student.id|string %}selected{% endif %}>
                         {{ student.name }}
                     </option>
@@ -44,48 +48,53 @@
         </div>
         
         <div style="display: flex; align-items: flex-end;">
-            <button type="submit" class="btn" style="width: 100%;">Filter</button>
+            <button type="submit" class="btn btn-success" style="width: 100%;">Filter</button>
         </div>
     </div>
 </form>
-{% if records %}
-<div class="table-container">
-<table>
-    <thead>
-        <tr>
-            <th>Date</th>
-            {% if current_user.role == 'teacher' %}
-            <th>Roll Number</th>
-            <th>Student Name</th>
-            {% endif %}
-            <th>Status</th>
-            <th>Remarks</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for record in records %}
-        <tr>
-            <td>{{ record.date.strftime('%Y-%m-%d') }}</td>
-            {% if current_user.role == 'teacher' %}
-            <td>{{ record.student.roll_number }}</td>
-            <td>{{ record.student.name }}</td>
-            {% endif %}
-            <td>
-                {% if record.status == 'present' %}
-                    <span class="percentage high">✓ Present</span>
-                {% elif record.status == 'absent' %}
-                    <span class="percentage low">✗ Absent</span>
-                {% else %}
-                    <span class="percentage medium">⏰ Late</span>
-                {% endif %}
-            </td>
-            <td>{{ record.remarks or '-' }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-</div>
-{% else %}
-<p>No attendance records found for the selected filters.</p>
-{% endif %}
+{% endcall %}
+
+{% call render_card("Search Results") %}
+    {% if records %}
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    {% if current_user.role == 'teacher' %}
+                    <th>Roll Number</th>
+                    <th>Student Name</th>
+                    {% endif %}
+                    <th>Status</th>
+                    <th>Remarks</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in records %}
+                <tr>
+                    <td>{{ record.date.strftime('%Y-%m-%d') }}</td>
+                    {% if current_user.role == 'teacher' %}
+                    <td>{{ record.student.roll_number }}</td>
+                    <td>{{ record.student.name }}</td>
+                    {% endif %}
+                    <td>
+                        {% if record.status == 'present' %}
+                            <span class="percentage high">✓ Present</span>
+                        {% elif record.status == 'absent' %}
+                            <span class="percentage low">✗ Absent</span>
+                        {% else %}
+                            <span class="percentage medium">⏰ Late</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ record.remarks or '-' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p style="margin: 0;">No attendance records found for the selected filters.</p>
+    {% endif %}
+{% endcall %}
+
 {% endblock %}

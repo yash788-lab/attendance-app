@@ -1,42 +1,51 @@
 {% extends "base.html" %}
+{# Import the card macro #}
+{% from "components/card.html" import render_card %}
 
 {% block title %}Add Student - Attendance Tracker{% endblock %}
 
 {% block content %}
-<h2>➕ Add New Student</h2>
-
-<form method="POST" style="max-width: 600px;">
-
-    <div class="form-group">
-        <label for="name">Name *</label>
-        <input type="text" id="name" name="name" required>
-    </div>
-
-    <!-- ✅ NEW FIELD -->
-    <div class="form-group">
-    <label for="class_id">Class *</label>
-    <select id="class_id" name="class_id" required>
-        <option value="">Select Class</option>
-        {% for cls in classes %}
-            <option value="{{ cls.id }}">{{ cls.name }}</option>
-        {% endfor %}
-    </select>
-    </div>
+<div style="max-width: 600px; margin: 0 auto;">
     
-    <div class="form-group">
-        <label for="roll_number">Roll Number *</label>
-        <input type="text" id="roll_number" name="roll_number" required>
-    </div>
-    
-    <!-- ✅ NOW REQUIRED -->
-    <div class="form-group">
-        <label for="email">Email (used as password) *</label>
-        <input type="email" id="email" name="email" required>
-    </div>
-    
-    <div style="display: flex; gap: 10px;">
-        <button type="submit" class="btn">Add Student</button>
-        <a href="{{ url_for('main.students') }}" class="btn" style="background: #6c757d;">Cancel</a>
-    </div>
-</form>
+    {% call render_card("➕ Add New Student") %}
+        
+        <form method="POST">
+            
+            <div class="form-group">
+                <label for="name">Name *</label>
+                <input type="text" id="name" name="name" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label for="class_id">Class *</label>
+                <select id="class_id" name="class_id" class="form-control" required>
+                    <option value="">Select Class</option>
+                    {% for cls in classes %}
+                        <option value="{{ cls.id }}">{{ cls.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="roll_number">Roll Number *</label>
+                <input type="text" id="roll_number" name="roll_number" class="form-control" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email (used as password) *</label>
+                <input type="email" id="email" name="email" class="form-control" required>
+            </div>
+            
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button type="submit" class="btn btn-success">Add Student</button>
+                <a href="{{ url_for('main.students') }}" class="btn" style="background: #6c757d; text-decoration: none; display: flex; align-items: center;">
+                    Cancel
+                </a>
+            </div>
+
+        </form>
+
+    {% endcall %}
+
+</div>
 {% endblock %}
