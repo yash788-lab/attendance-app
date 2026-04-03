@@ -21,6 +21,7 @@ def manage_marks():
 
     students_list = []
     existing_marks = {}
+    existing_max_marks = {}
 
     if class_id and subject_id and exam_id:
         students_list = Student.query.filter_by(class_id=class_id).all()
@@ -32,6 +33,7 @@ def manage_marks():
             ).first()
             if m:
                 existing_marks[s.id] = m.marks_obtained
+                existing_max_marks[s.id] = m.max_marks
 
     if request.method == 'POST':
         cls_id = request.form.get('class_id')
@@ -42,7 +44,8 @@ def manage_marks():
 
         for s in students:
             score = request.form.get(f'marks_{s.id}')
-            if score:
+            max_score = request.form.get(f'max_marks_{s.id}', 100)
+            if score and max_score:
                 mark = Mark.query.filter_by(
                     student_id=s.id,
                     subject_id=sub_id,
@@ -51,12 +54,14 @@ def manage_marks():
 
                 if mark:
                     mark.marks_obtained = float(score)
+                    mark.max_marks = float(max_score)
                 else:
                     db.session.add(Mark(
                         student_id=s.id,
                         subject_id=sub_id,
                         exam_id=ex_id,
-                        marks_obtained=float(score)
+                        marks_obtained=float(score),
+                        max_marks=float(max_score)
                     ))
 
         db.session.commit()
@@ -67,5 +72,12 @@ def manage_marks():
 @main.route('/marks/student')
 @login_required
 def student_marks():
-    # To be implemented later. Render dummy for now to satisfy url_for
-    return "<h1>Student Marks Coming Soon</h1>"
+    from flask_login import current_user
+    
+    marks = Mark.query.filter_by(student_id=current_user.id)\
+        .join(Subject)\
+        .join(Exam)\
+        .order_by(Exam.name, Subject.name)\
+        .all()
+        
+    return render_template('student_marks.html', marks=marks)

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% from "components/card.html" import render_card %}
+
+{% block title %}My Marks - Attendance Tracker{% endblock %}
+
+{% block heading %}📊 My Exam Marks{% endblock %}
+
+{% block content %}
+
+{% call render_card("Your Results") %}
+    {% if marks %}
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Exam</th>
+                        <th>Subject</th>
+                        <th>Marks Obtained</th>
+                        <th>Max Marks</th>
+                        <th>Percentage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for m in marks %}
+                    {% set pct = ((m.marks_obtained / m.max_marks) * 100)|round(1) if m.max_marks else 0 %}
+                    <tr>
+                        <td>{{ m.exam.name }}</td>
+                        <td>{{ m.subject.name }}</td>
+                        <td><strong>{{ m.marks_obtained|int }}</strong></td>
+                        <td>{{ m.max_marks|int }}</td>
+                        <td>
+                            <span class="badge {% if pct >= 75 %}badge-green{% elif pct >= 50 %}badge-yellow{% else %}badge-red{% endif %}">
+                                {{ pct }}%
+                            </span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p style="margin: 0; color: #718096; text-align: center; padding: 20px;">
+            No marks have been recorded for you yet. Check back after your exams!
+        </p>
+    {% endif %}
+{% endcall %}
+
+<style>
+    .badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        display: inline-block;
+    }
+    .badge-green { background: rgba(198, 246, 213, 0.6); color: #22543d; }
+    .badge-yellow { background: rgba(254, 252, 191, 0.6); color: #744210; }
+    .badge-red { background: rgba(254, 215, 215, 0.6); color: #822727; }
+</style>
+
+{% endblock %}
