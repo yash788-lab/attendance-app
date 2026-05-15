@@ -137,3 +137,66 @@ def change_password():
 def logout():
     logout_user()
     return redirect(url_for('main.login'))
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# RENDER SETUP ROUTE (ONE-TIME USE)
+# ─────────────────────────────────────────────────────────────────────────────
+@main.route('/setup-render-db')
+def setup_render_db():
+    """
+    Emergency route to reset and migrate the database on Render 
+    without needing shell access. This will drop all tables and re-create them.
+    """
+    try:
+        from database import db
+        from sqlalchemy import text
+        # 0. Drop alembic version table so migrations run fresh
+        try:
+            db.session.execute(text("DROP TABLE IF EXISTS alembic_version CASCADE;"))
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+
+        # 1. Drop all tables
+        db.drop_all()
+        
+        # 2. Run alembic upgrade
+        from flask_migrate import upgrade
+        upgrade()
+        
+        # 3. Seed data
+        from models.academic import Class, Subject, Exam
+        if not Class.query.first():
+            for name in ['5', '6', '7', '8', '9', '10', '11-Maths', '11-Science', '12-Maths', '12-Science']:
+                db.session.add(Class(name=name))
+            db.session.commit()
+
+        if not Subject.query.first():
+            for name, code in [
+                ('Mathematics', 'MATH'), ('Science', 'SCI'), ('English', 'ENG'),
+                ('History', 'HIST'), ('Physics', 'PHY'), ('Chemistry', 'CHEM'),
+            ]:
+                db.session.add(Subject(name=name, code=code))
+            db.session.commit()
+
+        if not Exam.query.first():
+            for name in ['Unit Test 1', 'Unit Test 2', 'Mid-Term', 'Final Exam']:
+                db.session.add(Exam(name=name, term='2025-26'))
+            db.session.commit()
+
+        # 4. Seed admin
+        from models.user import User, Admin
+        if not User.query.filter_by(email='admin@school.edu').first():
+            user = User(email='admin@school.edu', role='admin', is_active=True)
+            user.set_password('admin123')
+            db.session.add(user)
+            db.session.flush()
+            admin = Admin(user_id=user.id, name='Super Admin')
+            db.session.add(admin)
+            db.session.commit()
+
+        return "✅ Render Setup Complete! Database has been reset, migrated, and seeded. You can now login at /login with admin@school.edu and password admin123."
+
+    except Exception as e:
+        return f"❌ Error during setup: {str(e)}", 500
