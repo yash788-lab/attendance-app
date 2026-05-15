@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}Manage Marks — School ERP{% endblock %}
+{% block page_title %}Manage Marks{% endblock %}
+{% block content %}
+<div class="page-header"><h2>🎯 Manage Marks</h2></div>
+
+<!-- Filter Form -->
+<div class="card" style="margin-bottom:20px;">
+    <form method="GET" style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;">
+        <div class="form-group" style="margin:0;flex:1;min-width:150px;">
+            <label>Class</label>
+            <select name="class_id" class="form-control">
+                <option value="">Select Class</option>
+                {% for c in classes %}
+                    <option value="{{ c.id }}" {{ 'selected' if class_id == c.id }}>Class {{ c.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group" style="margin:0;flex:1;min-width:150px;">
+            <label>Subject</label>
+            <select name="subject_id" class="form-control">
+                <option value="">Select Subject</option>
+                {% for s in subjects %}
+                    <option value="{{ s.id }}" {{ 'selected' if subject_id == s.id }}>{{ s.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group" style="margin:0;flex:1;min-width:150px;">
+            <label>Exam</label>
+            <select name="exam_id" class="form-control">
+                <option value="">Select Exam</option>
+                {% for e in exams %}
+                    <option value="{{ e.id }}" {{ 'selected' if exam_id == e.id }}>{{ e.name }} ({{ e.term }})</option>
+                {% endfor %}
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Load Students</button>
+    </form>
+</div>
+
+{% if students_list %}
+<form method="POST">
+    <input type="hidden" name="class_id" value="{{ class_id }}">
+    <input type="hidden" name="subject_id" value="{{ subject_id }}">
+    <input type="hidden" name="exam_id" value="{{ exam_id }}">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">{{ students_list|length }} Students</h3>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>Roll</th><th>Name</th><th>Marks Obtained</th><th>Max Marks</th></tr>
+                </thead>
+                <tbody>
+                    {% for s in students_list %}
+                    <tr>
+                        <td>{{ s.roll_number }}</td>
+                        <td>{{ s.name }}</td>
+                        <td>
+                            <input type="number" name="marks_{{ s.id }}" class="form-control"
+                                   style="width:110px;"
+                                   value="{{ existing_marks.get(s.id, '') }}"
+                                   min="0" step="0.5" placeholder="—">
+                        </td>
+                        <td>
+                            <input type="number" name="max_marks_{{ s.id }}" class="form-control"
+                                   style="width:110px;"
+                                   value="{{ existing_max_marks.get(s.id, 100) }}"
+                                   min="1">
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div style="padding:20px 0 0;">
+            <button type="submit" class="btn btn-primary">💾 Save Marks</button>
+        </div>
+    </div>
+</form>
+{% elif class_id or subject_id or exam_id %}
+<div class="card" style="text-align:center;padding:40px;color:var(--text-muted);">
+    <p>Select all three filters (class, subject, exam) to load students.</p>
+</div>
+{% else %}
+<div class="card" style="text-align:center;padding:40px;color:var(--text-muted);">
+    <div style="font-size:2.5rem;margin-bottom:12px;">🎯</div>
+    <p>Select a class, subject, and exam above to enter marks.</p>
+</div>
+{% endif %}
+{% endblock %}

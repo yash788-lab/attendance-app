@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard — School ERP{% endblock %}
+{% block page_title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>⚙️ Administration Overview</h2>
+    <p>System-wide stats and pending actions.</p>
+</div>
+
+<!-- Stats -->
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon purple">👥</div>
+        <div>
+            <div class="stat-value">{{ total_students }}</div>
+            <div class="stat-label">Total Students</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon cyan">👨‍🏫</div>
+        <div>
+            <div class="stat-value">{{ total_teachers }}</div>
+            <div class="stat-label">Approved Teachers</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon amber">⏳</div>
+        <div>
+            <div class="stat-value">{{ pending_teachers }}</div>
+            <div class="stat-label">Pending Approvals</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon green">🏛️</div>
+        <div>
+            <div class="stat-value">{{ total_classes }}</div>
+            <div class="stat-label">Classes</div>
+        </div>
+    </div>
+</div>
+
+<!-- Pending Teacher Registrations -->
+{% if recent_registrations %}
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">⏳ Pending Teacher Approvals</h3>
+        <a href="{{ url_for('main.admin_teachers') }}" class="btn btn-outline btn-sm">View All</a>
+    </div>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Registered</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for teacher in recent_registrations %}
+                <tr>
+                    <td><strong>{{ teacher.name }}</strong></td>
+                    <td>{{ teacher.user.email }}</td>
+                    <td>{{ teacher.phone or '—' }}</td>
+                    <td>{{ teacher.created_at.strftime('%d %b %Y') }}</td>
+                    <td style="display:flex;gap:8px;">
+                        <form method="POST" action="{{ url_for('main.approve_teacher', teacher_id=teacher.id) }}" style="display:inline;">
+                            <button class="btn btn-success btn-sm">✓ Approve</button>
+                        </form>
+                        <form method="POST" action="{{ url_for('main.reject_teacher', teacher_id=teacher.id) }}" style="display:inline;" onsubmit="return confirm('Reject and delete this registration?')">
+                            <button class="btn btn-danger btn-sm">✕ Reject</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% else %}
+<div class="card" style="text-align:center;padding:40px;color:var(--text-muted);">
+    <div style="font-size:2.5rem;margin-bottom:12px;">✅</div>
+    <p>No pending teacher registrations.</p>
+</div>
+{% endif %}
+
+<!-- Quick Actions -->
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-top:24px;">
+    <a href="{{ url_for('main.admin_students') }}" class="card" style="text-decoration:none;cursor:pointer;transition:box-shadow .2s;" onmouseover="this.style.boxShadow='0 8px 24px rgba(99,102,241,.15)'" onmouseout="this.style.boxShadow=''">
+        <div style="font-size:2rem;margin-bottom:10px;">👥</div>
+        <div style="font-weight:700;">Manage Students</div>
+        <div style="color:var(--text-muted);font-size:.85rem;margin-top:4px;">Add, view, delete students</div>
+    </a>
+    <a href="{{ url_for('main.admin_teachers') }}" class="card" style="text-decoration:none;cursor:pointer;transition:box-shadow .2s;" onmouseover="this.style.boxShadow='0 8px 24px rgba(99,102,241,.15)'" onmouseout="this.style.boxShadow=''">
+        <div style="font-size:2rem;margin-bottom:10px;">👨‍🏫</div>
+        <div style="font-weight:700;">Manage Teachers</div>
+        <div style="color:var(--text-muted);font-size:.85rem;margin-top:4px;">Approve or remove teachers</div>
+    </a>
+    <a href="{{ url_for('main.admin_classes') }}" class="card" style="text-decoration:none;cursor:pointer;transition:box-shadow .2s;" onmouseover="this.style.boxShadow='0 8px 24px rgba(99,102,241,.15)'" onmouseout="this.style.boxShadow=''">
+        <div style="font-size:2rem;margin-bottom:10px;">🏛️</div>
+        <div style="font-weight:700;">Classes & Subjects</div>
+        <div style="color:var(--text-muted);font-size:.85rem;margin-top:4px;">Manage academic structure</div>
+    </a>
+    <a href="{{ url_for('main.admin_exams') }}" class="card" style="text-decoration:none;cursor:pointer;transition:box-shadow .2s;" onmouseover="this.style.boxShadow='0 8px 24px rgba(99,102,241,.15)'" onmouseout="this.style.boxShadow=''">
+        <div style="font-size:2rem;margin-bottom:10px;">📝</div>
+        <div style="font-weight:700;">Exams</div>
+        <div style="color:var(--text-muted);font-size:.85rem;margin-top:4px;">Add and manage exam types</div>
+    </a>
+</div>
+{% endblock %}

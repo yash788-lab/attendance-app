@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Teachers — Admin{% endblock %}
+{% block page_title %}Teacher Management{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h2>👨‍🏫 Teachers</h2>
+    <p>Approve pending registrations and manage all teachers.</p>
+</div>
+
+{% if pending %}
+<div class="card" style="margin-bottom:24px;">
+    <div class="card-header">
+        <h3 class="card-title">⏳ Pending Approval ({{ pending|length }})</h3>
+    </div>
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Applied On</th><th>Actions</th></tr></thead>
+            <tbody>
+                {% for t in pending %}
+                <tr>
+                    <td><strong>{{ t.name }}</strong></td>
+                    <td>{{ t.user.email }}</td>
+                    <td>{{ t.phone or '—' }}</td>
+                    <td>{{ t.created_at.strftime('%d %b %Y') }}</td>
+                    <td style="display:flex;gap:8px;">
+                        <form method="POST" action="{{ url_for('main.approve_teacher', teacher_id=t.id) }}">
+                            <button class="btn btn-success btn-sm">✓ Approve</button>
+                        </form>
+                        <form method="POST" action="{{ url_for('main.reject_teacher', teacher_id=t.id) }}" onsubmit="return confirm('Permanently reject this registration?')">
+                            <button class="btn btn-danger btn-sm">✕ Reject</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">✅ Approved Teachers ({{ approved|length }})</h3>
+    </div>
+    {% if approved %}
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Joined</th><th>Status</th></tr></thead>
+            <tbody>
+                {% for t in approved %}
+                <tr>
+                    <td><strong>{{ t.name }}</strong></td>
+                    <td>{{ t.user.email }}</td>
+                    <td>{{ t.phone or '—' }}</td>
+                    <td>{{ t.created_at.strftime('%d %b %Y') }}</td>
+                    <td><span class="badge badge-green">Active</span></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p style="color:var(--text-muted);text-align:center;padding:24px;">No approved teachers yet.</p>
+    {% endif %}
+</div>
+{% endblock %}

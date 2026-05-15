@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Mark Attendance — School ERP{% endblock %}
+{% block page_title %}Mark Attendance{% endblock %}
+{% block content %}
+<div class="page-header"><h2>📅 Mark Attendance</h2></div>
+
+<div class="card" style="margin-bottom:20px;">
+    <form method="GET" style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;">
+        <div class="form-group" style="margin:0;flex:1;min-width:160px;">
+            <label>Class</label>
+            <select name="class_id" class="form-control">
+                <option value="">All Classes</option>
+                {% for c in classes %}
+                    <option value="{{ c.id }}" {{ 'selected' if selected_class_id|string == c.id|string }}>Class {{ c.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group" style="margin:0;flex:1;min-width:160px;">
+            <label>Date</label>
+            <input type="date" name="date" class="form-control" value="{{ selected_date }}">
+        </div>
+        <button type="submit" class="btn btn-primary">Load Students</button>
+    </form>
+</div>
+
+{% if students %}
+<form method="POST">
+    <input type="hidden" name="class_id" value="{{ selected_class_id or '' }}">
+    <input type="hidden" name="date" value="{{ selected_date }}">
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">{{ students|length }} Students — {{ selected_date }}</h3>
+            <div style="display:flex;gap:8px;">
+                <button type="button" class="btn btn-outline btn-sm" onclick="markAll('present')">✓ All Present</button>
+                <button type="button" class="btn btn-outline btn-sm" onclick="markAll('absent')">✗ All Absent</button>
+            </div>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>Roll</th><th>Name</th><th>Status</th><th>Remarks</th></tr></thead>
+                <tbody>
+                    {% for s in students %}
+                    {% set existing = existing_attendance.get(s.id) %}
+                    <tr>
+                        <td>{{ s.roll_number }}</td>
+                        <td>{{ s.name }}</td>
+                        <td>
+                            <select name="status_{{ s.id }}" class="form-control status-select" style="width:140px;">
+                                <option value="">— Select —</option>
+                                <option value="present" {{ 'selected' if existing and existing.status == 'present' }}>✅ Present</option>
+                                <option value="absent"  {{ 'selected' if existing and existing.status == 'absent'  }}>❌ Absent</option>
+                                <option value="late"    {{ 'selected' if existing and existing.status == 'late'    }}>⚠️ Late</option>
+                            </select>
+                        </td>
+                        <td>
+                            <input type="text" name="remarks_{{ s.id }}" class="form-control"
+                                   value="{{ existing.remarks if existing else '' }}" placeholder="Optional">
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div style="padding:20px 0 0;">
+            <button type="submit" class="btn btn-primary">💾 Save Attendance</button>
+        </div>
+    </div>
+</form>
+
+<script>
+function markAll(status){
+    document.querySelectorAll('.status-select').forEach(function(s){ s.value = status; });
+}
+</script>
+{% else %}
+<div class="card" style="text-align:center;padding:40px;color:var(--text-muted);">
+    <div style="font-size:2.5rem;margin-bottom:12px;">📋</div>
+    <p>Select a class and date above to load students.</p>
+</div>
+{% endif %}
+{% endblock %}

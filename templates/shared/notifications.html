@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Notifications — School ERP{% endblock %}
+{% block page_title %}Notifications{% endblock %}
+{% block content %}
+<div class="page-header"><h2>🔔 Notifications</h2></div>
+<div class="card">
+    {% if notifications %}
+        {% for n in notifications %}
+        <div style="padding:18px 0;border-bottom:1px solid var(--border);display:flex;gap:16px;align-items:flex-start;">
+            <div style="font-size:1.4rem;">
+                {% if n.notification_type == 'success' %}✅
+                {% elif n.notification_type == 'warning' %}⚠️
+                {% elif n.notification_type == 'alert' %}🚨
+                {% else %}ℹ️{% endif %}
+            </div>
+            <div style="flex:1;">
+                <div style="font-weight:{{ '700' if not n.is_read else '500' }};font-size:.95rem;">{{ n.title }}</div>
+                <div style="color:var(--text-muted);font-size:.875rem;margin-top:4px;line-height:1.5;">{{ n.message }}</div>
+                <div style="color:var(--text-muted);font-size:.75rem;margin-top:6px;">
+                    {{ n.timestamp.strftime('%d %b %Y at %H:%M') }}
+                    {% if not n.recipient_user_id %}<span class="badge badge-blue" style="margin-left:8px;">Broadcast</span>{% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+    <div style="text-align:center;padding:48px;color:var(--text-muted);">
+        <div style="font-size:3rem;margin-bottom:16px;">🔕</div>
+        <p>No notifications yet.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

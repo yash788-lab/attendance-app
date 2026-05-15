@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Students — Teacher{% endblock %}
+{% block page_title %}All Students{% endblock %}
+{% block content %}
+<div class="page-header"><h2>👥 Students</h2></div>
+<div class="card">
+    {% if students %}
+    <div class="table-wrap">
+        <table>
+            <thead><tr><th>Roll</th><th>Name</th><th>Father's Name</th><th>Class</th><th>Email</th></tr></thead>
+            <tbody>
+                {% for s in students %}
+                <tr>
+                    <td>{{ s.roll_number }}</td>
+                    <td><strong>{{ s.name }}</strong></td>
+                    <td>{{ s.father_name or '—' }}</td>
+                    <td><span class="badge badge-blue">{{ s.class_info.name }}</span></td>
+                    <td>{{ s.email }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p style="color:var(--text-muted);text-align:center;padding:32px;">No students found.</p>
+    {% endif %}
+</div>
+{% endblock %}

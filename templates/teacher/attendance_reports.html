@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Attendance Reports — School ERP{% endblock %}
+{% block page_title %}Attendance Reports{% endblock %}
+{% block content %}
+<div class="page-header"><h2>📊 Attendance Reports</h2></div>
+
+<div class="card" style="margin-bottom:20px;">
+    <form method="GET" style="display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;">
+        <div class="form-group" style="margin:0;flex:1;min-width:150px;">
+            <label>Class</label>
+            <select name="class_id" class="form-control">
+                <option value="">Select Class</option>
+                {% for c in classes %}
+                    <option value="{{ c.id }}" {{ 'selected' if class_id == c.id }}>Class {{ c.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group" style="margin:0;flex:1;min-width:150px;">
+            <label>From Date</label>
+            <input type="date" name="start_date" class="form-control" value="{{ start_date or '' }}">
+        </div>
+        <div class="form-group" style="margin:0;flex:1;min-width:150px;">
+            <label>To Date</label>
+            <input type="date" name="end_date" class="form-control" value="{{ end_date or '' }}">
+        </div>
+        <button type="submit" class="btn btn-primary">Generate Report</button>
+    </form>
+</div>
+
+{% if report_data %}
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">Report — {{ report_data|length }} Students</h3>
+    </div>
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr><th>Roll</th><th>Name</th><th>Attendance %</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+                {% for row in report_data %}
+                <tr>
+                    <td>{{ row.student.roll_number }}</td>
+                    <td>{{ row.student.name }}</td>
+                    <td>
+                        <div style="display:flex;align-items:center;gap:10px;">
+                            <div style="width:100px;height:8px;background:var(--border);border-radius:4px;overflow:hidden;">
+                                <div style="width:{{ row.percentage }}%;height:100%;background:{{ '#10b981' if row.percentage >= 75 else '#f59e0b' if row.percentage >= 60 else '#ef4444' }};border-radius:4px;"></div>
+                            </div>
+                            <span>{{ row.percentage }}%</span>
+                        </div>
+                    </td>
+                    <td>
+                        {% if row.percentage >= 75 %}
+                            <span class="badge badge-green">Good</span>
+                        {% elif row.percentage >= 60 %}
+                            <span class="badge badge-yellow">Average</span>
+                        {% else %}
+                            <span class="badge badge-red">Low</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% elif class_id %}
+<div class="card" style="text-align:center;padding:40px;color:var(--text-muted);">
+    <p>No students or attendance records found for this selection.</p>
+</div>
+{% else %}
+<div class="card" style="text-align:center;padding:40px;color:var(--text-muted);">
+    <div style="font-size:2.5rem;margin-bottom:12px;">📊</div>
+    <p>Select a class above to generate an attendance report.</p>
+</div>
+{% endif %}
+{% endblock %}

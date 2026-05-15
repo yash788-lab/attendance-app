@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="School ERP — Login">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>Login — School ERP</title>
+    <style>
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            background: #0f172a;
+            color: #f1f5f9;
+        }
+        /* Left panel — branding */
+        .auth-left {
+            flex: 1;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #06b6d4 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 60px;
+            position: relative;
+            overflow: hidden;
+        }
+        .auth-left::before {
+            content:'';
+            position:absolute;
+            width:400px; height:400px;
+            border-radius:50%;
+            background: rgba(255,255,255,.07);
+            top:-100px; right:-100px;
+        }
+        .auth-left::after {
+            content:'';
+            position:absolute;
+            width:300px; height:300px;
+            border-radius:50%;
+            background: rgba(255,255,255,.05);
+            bottom:-80px; left:-60px;
+        }
+        .auth-left .brand { position:relative; z-index:1; }
+        .auth-left .logo-box {
+            width:56px; height:56px;
+            background:rgba(255,255,255,.2);
+            border-radius:14px;
+            display:flex; align-items:center; justify-content:center;
+            font-size:1.8rem; margin-bottom:24px;
+        }
+        .auth-left h1 { font-size:2.2rem; font-weight:800; color:white; line-height:1.2; }
+        .auth-left p  { font-size:1rem; color:rgba(255,255,255,.7); margin-top:12px; max-width:380px; line-height:1.6; }
+        .feature-list { margin-top:36px; display:flex; flex-direction:column; gap:14px; }
+        .feature-item {
+            display:flex; align-items:center; gap:12px;
+            color:rgba(255,255,255,.85); font-size:.9rem;
+        }
+        .feature-item span:first-child {
+            width:32px; height:32px;
+            background:rgba(255,255,255,.15);
+            border-radius:8px;
+            display:flex; align-items:center; justify-content:center;
+        }
+
+        /* Right panel — form */
+        .auth-right {
+            width: 480px;
+            background: #1e293b;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 60px 48px;
+        }
+        .auth-right h2 { font-size:1.6rem; font-weight:800; margin-bottom:6px; }
+        .auth-right .subtitle { color:#94a3b8; font-size:.9rem; margin-bottom:36px; }
+
+        .form-group { margin-bottom:20px; }
+        label { display:block; font-size:.875rem; font-weight:600; margin-bottom:8px; color:#cbd5e1; }
+        .input-wrap { position:relative; }
+        .input-icon {
+            position:absolute; left:14px; top:50%; transform:translateY(-50%);
+            color:#64748b; font-size:1rem;
+        }
+        input {
+            width:100%; padding:13px 14px 13px 42px;
+            background:#0f172a; border:1.5px solid #334155;
+            border-radius:10px; color:#f1f5f9;
+            font-size:.9rem; font-family:inherit;
+            transition:border-color .2s, box-shadow .2s;
+        }
+        input:focus {
+            outline:none;
+            border-color:#6366f1;
+            box-shadow:0 0 0 3px rgba(99,102,241,.2);
+        }
+        .btn-submit {
+            width:100%; padding:14px;
+            background:linear-gradient(135deg,#6366f1,#8b5cf6);
+            color:white; border:none; border-radius:10px;
+            font-size:1rem; font-weight:700; cursor:pointer;
+            font-family:inherit; margin-top:8px;
+            transition:opacity .2s, transform .2s;
+        }
+        .btn-submit:hover { opacity:.92; transform:translateY(-1px); }
+        .btn-submit:active { transform:scale(.98); }
+
+        .auth-link {
+            text-align:center; margin-top:24px;
+            font-size:.875rem; color:#64748b;
+        }
+        .auth-link a { color:#8b5cf6; text-decoration:none; font-weight:600; }
+        .auth-link a:hover { text-decoration:underline; }
+
+        .alert {
+            padding:12px 16px;
+            border-radius:8px;
+            border-left:4px solid;
+            margin-bottom:20px;
+            font-size:.875rem; font-weight:500;
+        }
+        .alert-error { background:rgba(239,68,68,.1); color:#fca5a5; border-color:#ef4444; }
+        .alert-warning{ background:rgba(245,158,11,.1); color:#fcd34d; border-color:#f59e0b; }
+        .alert-info   { background:rgba(99,102,241,.1); color:#a5b4fc; border-color:#6366f1; }
+        .alert-success{ background:rgba(16,185,129,.1); color:#6ee7b7; border-color:#10b981; }
+
+        @media(max-width:900px){
+            .auth-left { display:none; }
+            .auth-right { width:100%; padding:40px 28px; }
+        }
+    </style>
+</head>
+<body>
+<div class="auth-left">
+    <div class="brand">
+        <div class="logo-box">🏫</div>
+        <h1>School ERP<br>Management System</h1>
+        <p>A unified platform for students, teachers, and administrators.</p>
+        <div class="feature-list">
+            <div class="feature-item"><span>📊</span> Attendance Tracking</div>
+            <div class="feature-item"><span>📝</span> Marks & Analytics</div>
+            <div class="feature-item"><span>📢</span> Announcements & Events</div>
+            <div class="feature-item"><span>🔔</span> Real-time Notifications</div>
+        </div>
+    </div>
+</div>
+
+<div class="auth-right">
+    <h2>Welcome back</h2>
+    <p class="subtitle">Sign in to your account to continue</p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ 'error' if category in ('error','danger') else category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('main.login') }}">
+        <div class="form-group">
+            <label for="email">Email Address</label>
+            <div class="input-wrap">
+                <span class="input-icon">✉️</span>
+                <input type="email" id="email" name="email"
+                       placeholder="you@school.edu" required autocomplete="email">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <div class="input-wrap">
+                <span class="input-icon">🔒</span>
+                <input type="password" id="password" name="password"
+                       placeholder="••••••••" required autocomplete="current-password">
+            </div>
+        </div>
+        <button type="submit" class="btn-submit">Sign In →</button>
+    </form>
+
+    <div class="auth-link">
+        Are you a teacher? <a href="{{ url_for('main.teacher_register') }}">Register here</a>
+    </div>
+    <div class="auth-link" style="margin-top:8px;">
+        <small style="color:#475569;">Students: your default password is your roll number</small>
+    </div>
+</div>
+</body>
+</html>

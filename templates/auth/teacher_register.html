@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Registration — School ERP</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            background: #0f172a;
+            color: #f1f5f9;
+        }
+        .auth-left {
+            flex:1; background:linear-gradient(135deg,#06b6d4 0%,#6366f1 100%);
+            display:flex; flex-direction:column; justify-content:center;
+            align-items:flex-start; padding:60px; position:relative; overflow:hidden;
+        }
+        .auth-left::before { content:''; position:absolute; width:400px;height:400px;border-radius:50%;background:rgba(255,255,255,.07);top:-100px;right:-100px; }
+        .auth-left .logo-box { width:56px;height:56px;background:rgba(255,255,255,.2);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin-bottom:24px; }
+        .auth-left h1 { font-size:2rem;font-weight:800;color:white;line-height:1.2; }
+        .auth-left p  { font-size:.95rem;color:rgba(255,255,255,.7);margin-top:12px;max-width:380px;line-height:1.6; }
+        .step-list { margin-top:32px;display:flex;flex-direction:column;gap:16px; }
+        .step { display:flex;align-items:flex-start;gap:14px;color:rgba(255,255,255,.85);font-size:.88rem; }
+        .step-num { width:28px;height:28px;background:rgba(255,255,255,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.8rem;flex-shrink:0; }
+
+        .auth-right { width:500px;background:#1e293b;display:flex;flex-direction:column;justify-content:center;padding:50px 48px; }
+        .auth-right h2 { font-size:1.5rem;font-weight:800;margin-bottom:4px; }
+        .auth-right .subtitle { color:#94a3b8;font-size:.875rem;margin-bottom:32px; }
+
+        .form-grid { display:grid;grid-template-columns:1fr 1fr;gap:16px; }
+        .form-group { margin-bottom:18px; }
+        .form-group.full { grid-column:1/-1; }
+        label { display:block;font-size:.875rem;font-weight:600;margin-bottom:7px;color:#cbd5e1; }
+        .input-wrap { position:relative; }
+        .input-icon { position:absolute;left:13px;top:50%;transform:translateY(-50%);color:#64748b;font-size:.95rem; }
+        input {
+            width:100%;padding:12px 14px 12px 40px;
+            background:#0f172a;border:1.5px solid #334155;
+            border-radius:10px;color:#f1f5f9;font-size:.875rem;font-family:inherit;
+            transition:border-color .2s,box-shadow .2s;
+        }
+        input:focus { outline:none;border-color:#6366f1;box-shadow:0 0 0 3px rgba(99,102,241,.2); }
+        .btn-submit {
+            width:100%;padding:13px;
+            background:linear-gradient(135deg,#06b6d4,#6366f1);
+            color:white;border:none;border-radius:10px;
+            font-size:.95rem;font-weight:700;cursor:pointer;font-family:inherit;
+            transition:opacity .2s,transform .2s;
+        }
+        .btn-submit:hover { opacity:.92;transform:translateY(-1px); }
+        .auth-link { text-align:center;margin-top:20px;font-size:.875rem;color:#64748b; }
+        .auth-link a { color:#8b5cf6;text-decoration:none;font-weight:600; }
+        .alert { padding:12px 16px;border-radius:8px;border-left:4px solid;margin-bottom:16px;font-size:.875rem;font-weight:500; }
+        .alert-error { background:rgba(239,68,68,.1);color:#fca5a5;border-color:#ef4444; }
+        .alert-success { background:rgba(16,185,129,.1);color:#6ee7b7;border-color:#10b981; }
+        @media(max-width:900px){ .auth-left{display:none;} .auth-right{width:100%;padding:40px 24px;} }
+    </style>
+</head>
+<body>
+<div class="auth-left">
+    <div class="logo-box">👨‍🏫</div>
+    <h1>Teacher<br>Registration</h1>
+    <p>Apply to join the School ERP platform. Your account will be reviewed and approved by an administrator.</p>
+    <div class="step-list">
+        <div class="step"><span class="step-num">1</span> Fill in your details below</div>
+        <div class="step"><span class="step-num">2</span> Submit registration for review</div>
+        <div class="step"><span class="step-num">3</span> Admin approves your account</div>
+        <div class="step"><span class="step-num">4</span> Log in and start teaching!</div>
+    </div>
+</div>
+
+<div class="auth-right">
+    <h2>Register as Teacher</h2>
+    <p class="subtitle">All fields are required unless marked optional</p>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}{% for cat, msg in messages %}
+            <div class="alert alert-{{ 'error' if cat in ('error','danger') else cat }}">{{ msg }}</div>
+        {% endfor %}{% endif %}
+    {% endwith %}
+
+    <form method="POST">
+        <div class="form-grid">
+            <div class="form-group full">
+                <label>Full Name</label>
+                <div class="input-wrap">
+                    <span class="input-icon">👤</span>
+                    <input type="text" name="name" value="{{ name or '' }}" placeholder="e.g. Priya Sharma" required>
+                </div>
+            </div>
+            <div class="form-group full">
+                <label>Email Address</label>
+                <div class="input-wrap">
+                    <span class="input-icon">✉️</span>
+                    <input type="email" name="email" value="{{ email or '' }}" placeholder="teacher@school.edu" required>
+                </div>
+            </div>
+            <div class="form-group full">
+                <label>Phone (optional)</label>
+                <div class="input-wrap">
+                    <span class="input-icon">📞</span>
+                    <input type="tel" name="phone" value="{{ phone or '' }}" placeholder="+91 98765 43210">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <div class="input-wrap">
+                    <span class="input-icon">🔒</span>
+                    <input type="password" name="password" placeholder="Min 6 characters" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Confirm Password</label>
+                <div class="input-wrap">
+                    <span class="input-icon">🔒</span>
+                    <input type="password" name="confirm_password" placeholder="Repeat password" required>
+                </div>
+            </div>
+        </div>
+        <button type="submit" class="btn-submit">Submit Registration →</button>
+    </form>
+
+    <div class="auth-link">
+        Already have an account? <a href="{{ url_for('main.login') }}">Sign in</a>
+    </div>
+</div>
+</body>
+</html>

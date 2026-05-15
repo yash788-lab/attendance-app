@@ -1,43 +1,40 @@
 from flask import render_template, request, redirect, url_for, flash
-from flask_login import login_required
+from flask_login import login_required, current_user
 
-from models import Student, Class
+from models.student import Student
+from models.academic import Class
 from database import db
 from . import main
-from utils.decorators import teacher_required
+from utils.decorators import admin_or_teacher_required
 
 
+# Teacher/Admin: view all students (redirects admin to admin panel)
 @main.route('/students')
 @login_required
-@teacher_required
+@admin_or_teacher_required
 def students():
-    students = Student.query.join(Class).order_by(Class.name, Student.roll_number).all()
-    return render_template('students.html', students=students)
+    if current_user.role == 'admin':
+        return redirect(url_for('main.admin_students'))
+    students = (
+        Student.query
+        .join(Class)
+        .order_by(Class.name, Student.roll_number)
+        .all()
+    )
+    return render_template('teacher/students.html', students=students)
 
 
+# Legacy redirect: old /student/add goes to admin panel
 @main.route('/student/add', methods=['GET', 'POST'])
 @login_required
-@teacher_required
+@admin_or_teacher_required
 def add_student():
-    if request.method == 'POST':
-        student = Student(
-            name=request.form.get('name'),
-            father_name=request.form.get('father_name'),
-            class_id=request.form.get('class_id'),
-            roll_number=request.form.get('roll_number'),
-            email=request.form.get('email')
-        )
-        db.session.add(student)
-        db.session.commit()
+    return redirect(url_for('main.admin_add_student'))
 
-        flash(f'Student {student.name} added!', 'success')
-        return redirect(url_for('main.students'))
 
-    classes = Class.query.all()
-    return render_template('add_student.html', classes=classes)
-
+# Legacy redirect: old /student/delete goes to admin panel
 @main.route('/student/delete/<int:student_id>', methods=['POST'])
 @login_required
-@teacher_required
+@admin_or_teacher_required
 def delete_student(student_id):
-    return "Delete Student Stub"
+    return redirect(url_for('main.admin_delete_student', student_id=student_id))

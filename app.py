@@ -1,129 +1,157 @@
 import os
 import time
+import click
 from flask import Flask, redirect, url_for, session
 from flask_login import LoginManager, current_user, logout_user
 from flask_migrate import Migrate
-from sqlalchemy import inspect
 
-# Local imports
+# ── Local imports ─────────────────────────────────────────────────────────────
 from config import Config
 from database import db
-from models import Student, Class, Subject, Exam
-from auth import User, TEACHER_ID
 
 login_manager = LoginManager()
+
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
-    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret-key-123')
+    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-prod')
 
-    # 1. Initialize Database & Migrations
+    # 1. Init DB + Migrations
     db.init_app(app)
+
+    # Import ALL models so Alembic can detect the full schema
+    with app.app_context():
+        import models  # noqa: F401 — side-effect import registers all tables
+
     migrate = Migrate(app, db)
 
-    with app.app_context():
-        print("--- 🚀 SMS System Initialization Starting ---")
-        
-        # Create all tables (only creates what doesn't exist)
-        db.create_all()
-        print("✅ Tables checked/created.")
-
-        # --- 🛡️ SENIOR DEVELOPER SAFETY NET: Schema Update ---
-        # This manually adds 'father_name' if it's missing from your existing DB
-        inspector = inspect(db.engine)
-        columns = [c['name'] for c in inspector.get_columns('students')]
-        if 'father_name' not in columns:
-            print("⚠️ Column 'father_name' missing. Attempting to add...")
-            try:
-                # Use text() for direct SQL execution
-                db.session.execute(db.text('ALTER TABLE students ADD COLUMN father_name VARCHAR(100)'))
-                db.session.commit()
-                print("✅ 'father_name' column added successfully.")
-            except Exception as e:
-                db.session.rollback()
-                print(f"❌ Failed to add column: {e}")
-
-        # --- 🧬 SEEDING LOGIC ---
-        
-        # Seed Classes
-        if not Class.query.first():
-            print("🌱 Seeding Classes...")
-            class_list = ["5", "6", "7", "8", "9", "10", "11-maths", "11-science", "12-maths", "12-science"]
-            for c in class_list:
-                db.session.add(Class(name=c))
-            db.session.commit()
-
-        # Seed Subjects
-        if not Subject.query.first():
-            print("🌱 Seeding Subjects...")
-            subjects = ['Mathematics', 'Science', 'English', 'History', 'Physics', 'Chemistry']
-            for s in subjects:
-                db.session.add(Subject(name=s))
-            db.session.commit()
-
-        # Seed Exams
-        if not Exam.query.first():
-            print("🌱 Seeding Exam Types...")
-            exams = [('Unit Test 1', '2025-26'), ('Mid-Term', '2025-26'), ('Final Exam', '2025-26')]
-            for name, term in exams:
-                db.session.add(Exam(name=name, term=term))
-            db.session.commit()
-            
-        print("--- ✨ Database Initialization Complete ---")
-
-    # 2. Login Manager Configuration
+    # 2. Login Manager
     login_manager.init_app(app)
     login_manager.login_view = 'main.login'
-    login_manager.session_protection = "strong"
+    login_manager.login_message = 'Please log in to access this page.'
+    login_manager.login_message_category = 'warning'
+    login_manager.session_protection = 'strong'
 
-    # 3. Session Management (Inactivity Timeout)
+    # 3. Session / inactivity timeout
     @app.before_request
     def session_management():
         if not current_user.is_authenticated:
             return
-        
         session.permanent = True
         now = time.time()
-
-        # Set timeout: Teacher (1hr), Student (10min)
-        timeout = 3600 if current_user.role == 'teacher' else 600
-
+        # Admin/Teacher: 2 hrs | Student: 20 min
+        timeout = 7200 if current_user.role in ('admin', 'teacher') else 1200
         if 'last_activity' in session:
-            elapsed = now - session['last_activity']
-            if elapsed > timeout:
+            if now - session['last_activity'] > timeout:
                 logout_user()
                 session.clear()
                 return redirect(url_for('main.login'))
-
         session['last_activity'] = now
 
     # 4. Register Blueprints
     from routes import main as main_blueprint
     app.register_blueprint(main_blueprint)
 
+    # 5. Register CLI commands
+    _register_cli(app)
+
     return app
 
-# --- USER LOADER ---
+
+# ── USER LOADER ───────────────────────────────────────────────────────────────
 @login_manager.user_loader
 def load_user(user_id):
+    """Load a User from the database by primary key (string from session)."""
+    from models.user import User
     try:
-        user_id = int(user_id)
-        if user_id == TEACHER_ID:
-            return User(id=TEACHER_ID, role='teacher')
-        
-        # Use session.get() for SQLAlchemy 2.0 compatibility
-        student = db.session.get(Student, user_id)
-        if student:
-            return User(id=student.id, role='student')
+        return db.session.get(User, int(user_id))
     except (ValueError, TypeError):
         return None
-    return None
 
-# --- RUN APP ---
+
+# ── CLI COMMANDS ──────────────────────────────────────────────────────────────
+def _register_cli(app: Flask):
+
+    @app.cli.command('seed-admin')
+    @click.option('--name', default='Admin', help='Admin display name')
+    @click.option('--email', prompt=True, help='Admin email address')
+    @click.option('--password', prompt=True, hide_input=True,
+                  confirmation_prompt=True, help='Admin password')
+    def seed_admin(name, email, password):
+        """Create the first admin account (run once after initial migration)."""
+        from models.user import User, Admin
+        if User.query.filter_by(email=email).first():
+            click.echo(f'⚠️  A user with email "{email}" already exists.')
+            return
+        user = User(email=email, role='admin', is_active=True)
+        user.set_password(password)
+        db.session.add(user)
+        db.session.flush()
+        admin = Admin(user_id=user.id, name=name)
+        db.session.add(admin)
+        db.session.commit()
+        click.echo(f'✅ Admin account created: {email}')
+
+    @app.cli.command('seed-student-accounts')
+    def seed_student_accounts():
+        """Create User accounts for all existing students who don't have one.
+        Default password = roll_number. Students are prompted to change on first login.
+        """
+        from models.user import User
+        from models.student import Student
+        created = 0
+        skipped = 0
+        for student in Student.query.filter_by(user_id=None).all():
+            # Check if email already taken by another user
+            if User.query.filter_by(email=student.email).first():
+                click.echo(f'  ⚠️  Skipping {student.name}: email already registered.')
+                skipped += 1
+                continue
+            user = User(
+                email=student.email,
+                role='student',
+                is_active=True,
+                must_change_password=True
+            )
+            user.set_password(student.roll_number)
+            db.session.add(user)
+            db.session.flush()
+            student.user_id = user.id
+            created += 1
+        db.session.commit()
+        click.echo(f'✅ Done — {created} accounts created, {skipped} skipped.')
+
+    @app.cli.command('seed-data')
+    def seed_data():
+        """Seed default Classes, Subjects, and Exam types if they don't exist."""
+        from models.academic import Class, Subject, Exam
+        if not Class.query.first():
+            click.echo('🌱 Seeding classes...')
+            for name in ['5', '6', '7', '8', '9', '10', '11-Maths', '11-Science', '12-Maths', '12-Science']:
+                db.session.add(Class(name=name))
+            db.session.commit()
+
+        if not Subject.query.first():
+            click.echo('🌱 Seeding subjects...')
+            for name, code in [
+                ('Mathematics', 'MATH'), ('Science', 'SCI'), ('English', 'ENG'),
+                ('History', 'HIST'), ('Physics', 'PHY'), ('Chemistry', 'CHEM'),
+            ]:
+                db.session.add(Subject(name=name, code=code))
+            db.session.commit()
+
+        if not Exam.query.first():
+            click.echo('🌱 Seeding exam types...')
+            for name in ['Unit Test 1', 'Unit Test 2', 'Mid-Term', 'Final Exam']:
+                db.session.add(Exam(name=name, term='2025-26'))
+            db.session.commit()
+        click.echo('✅ Seed data complete.')
+
+
+# ── ENTRY POINT ───────────────────────────────────────────────────────────────
 app = create_app()
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
-    # Note: Use use_reloader=False if you are debugging startup issues to avoid double-logging
-    app.run(host="0.0.0.0", port=port, debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=True)

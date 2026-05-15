@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}My Marks — School ERP{% endblock %}
+{% block page_title %}My Marks{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h2>🎯 My Marks</h2>
+    <p>{{ student.name }} — Class {{ student.class_info.name }}</p>
+</div>
+
+{% if marks %}
+    {% set exams_grouped = {} %}
+    {% for m in marks %}
+        {% if m.exam.name not in exams_grouped %}
+            {% set _ = exams_grouped.update({m.exam.name: []}) %}
+        {% endif %}
+        {% set _ = exams_grouped[m.exam.name].append(m) %}
+    {% endfor %}
+
+    {% for exam_name, exam_marks in exams_grouped.items() %}
+    <div class="card" style="margin-bottom:20px;">
+        <div class="card-header">
+            <h3 class="card-title">📝 {{ exam_name }}</h3>
+            {% set total = exam_marks|sum(attribute='marks_obtained') %}
+            {% set max_total = exam_marks|sum(attribute='max_marks') %}
+            <span class="badge badge-blue">Total: {{ total|int }}/{{ max_total|int }}</span>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>Subject</th><th>Marks</th><th>Max</th><th>%</th><th>Grade</th><th>Remarks</th></tr>
+                </thead>
+                <tbody>
+                    {% for m in exam_marks %}
+                    <tr>
+                        <td><strong>{{ m.subject.name }}</strong></td>
+                        <td>{{ m.marks_obtained }}</td>
+                        <td>{{ m.max_marks }}</td>
+                        <td>{{ m.percentage }}%</td>
+                        <td>
+                            <span class="badge {{ 'badge-green' if m.grade in ('A+','A') else 'badge-blue' if m.grade in ('B+','B') else 'badge-yellow' if m.grade == 'C' else 'badge-red' }}">
+                                {{ m.grade }}
+                            </span>
+                        </td>
+                        <td style="color:var(--text-muted);">{{ m.remarks or '—' }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endfor %}
+{% else %}
+<div class="card" style="text-align:center;padding:48px;color:var(--text-muted);">
+    <div style="font-size:3rem;margin-bottom:16px;">📊</div>
+    <p>No marks have been entered yet. Check back after your exams.</p>
+</div>
+{% endif %}
+{% endblock %}

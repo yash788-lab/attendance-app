@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Add Student — Admin{% endblock %}
+{% block page_title %}Add New Student{% endblock %}
+{% block content %}
+<div style="max-width:600px;">
+    <div class="page-header">
+        <h2>➕ Add Student</h2>
+        <p>A login account will be auto-created. Default password = roll number.</p>
+    </div>
+    <div class="card">
+        <form method="POST">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Full Name *</label>
+                    <input type="text" name="name" class="form-control" placeholder="e.g. Aryan Sharma" required>
+                </div>
+                <div class="form-group">
+                    <label>Father's Name</label>
+                    <input type="text" name="father_name" class="form-control" placeholder="Optional">
+                </div>
+                <div class="form-group">
+                    <label>Class *</label>
+                    <select name="class_id" class="form-control" required>
+                        <option value="">Select Class</option>
+                        {% for c in classes %}
+                            <option value="{{ c.id }}">{{ c.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Roll Number *</label>
+                    <input type="text" name="roll_number" class="form-control" placeholder="e.g. 101" required>
+                </div>
+                <div class="form-group">
+                    <label>Email Address *</label>
+                    <input type="email" name="email" class="form-control" placeholder="student@school.edu" required>
+                </div>
+                <div class="form-group">
+                    <label>Phone (optional)</label>
+                    <input type="tel" name="phone" class="form-control" placeholder="+91 9876543210">
+                </div>
+            </div>
+            <div style="display:flex;gap:12px;margin-top:8px;">
+                <button type="submit" class="btn btn-primary">Add Student</button>
+                <a href="{{ url_for('main.admin_students') }}" class="btn btn-outline">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
