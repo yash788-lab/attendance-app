@@ -151,15 +151,22 @@ def setup_render_db():
     try:
         from database import db
         from sqlalchemy import text
-        # 0. Drop alembic version table so migrations run fresh
+        import traceback
+
+        # 1. WIPE THE DATABASE (PostgreSQL specific)
         try:
-            db.session.execute(text("DROP TABLE IF EXISTS alembic_version CASCADE;"))
+            db.session.execute(text("DROP SCHEMA public CASCADE;"))
+            db.session.execute(text("CREATE SCHEMA public;"))
             db.session.commit()
         except Exception:
             db.session.rollback()
-
-        # 1. Drop all tables
-        db.drop_all()
+            # Fallback for SQLite locally
+            db.drop_all()
+            try:
+                db.session.execute(text("DROP TABLE IF EXISTS alembic_version;"))
+                db.session.commit()
+            except Exception:
+                db.session.rollback()
         
         # 2. Run alembic upgrade
         from flask_migrate import upgrade
@@ -199,4 +206,5 @@ def setup_render_db():
         return "✅ Render Setup Complete! Database has been reset, migrated, and seeded. You can now login at /login with admin@school.edu and password admin123."
 
     except Exception as e:
-        return f"❌ Error during setup: {str(e)}", 500
+        import traceback
+        return f"❌ Error during setup: {str(e)}<br><pre>{traceback.format_exc()}</pre>", 500
