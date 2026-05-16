@@ -26,7 +26,7 @@ def _authenticate(email, password):
 @main.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
     if current_user.is_authenticated:
-        return redirect(url_for('main.index'))
+        return redirect(url_for('main.dashboard'))
 
     if request.method == 'POST':
         email    = request.form.get('email', '')
@@ -53,7 +53,7 @@ def admin_login():
 @main.route('/student/login', methods=['GET', 'POST'])
 def student_login():
     if current_user.is_authenticated:
-        return redirect(url_for('main.index'))
+        return redirect(url_for('main.dashboard'))
 
     if request.method == 'POST':
         email    = request.form.get('email', '')
@@ -74,7 +74,7 @@ def student_login():
             flash('Please set a new password before continuing.', 'info')
             return redirect(url_for('main.change_password'))
 
-        return redirect(url_for('main.index'))
+        return redirect(url_for('main.dashboard'))
 
     return render_template('auth/student_login.html')
 
@@ -85,7 +85,7 @@ def student_login():
 @main.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('main.index'))
+        return redirect(url_for('main.dashboard'))
 
     if request.method == 'POST':
         email    = request.form.get('email', '')
@@ -115,7 +115,7 @@ def login():
             flash('Please set a new password before continuing.', 'info')
             return redirect(url_for('main.change_password'))
 
-        return redirect(url_for('main.index'))
+        return redirect(url_for('main.dashboard'))
 
     return render_template('auth/login.html')
 
@@ -126,7 +126,7 @@ def login():
 @main.route('/teacher/register', methods=['GET', 'POST'])
 def teacher_register():
     if current_user.is_authenticated:
-        return redirect(url_for('main.index'))
+        return redirect(url_for('main.dashboard'))
 
     if request.method == 'POST':
         name = request.form.get('name', '').strip()
@@ -197,7 +197,7 @@ def change_password():
         current_user.must_change_password = False
         db.session.commit()
         flash('Password updated successfully!', 'success')
-        return redirect(url_for('main.index'))
+        return redirect(url_for('main.dashboard'))
 
     return render_template('auth/change_password.html')
 

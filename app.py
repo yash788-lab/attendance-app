@@ -64,6 +64,9 @@ def create_app():
     from routes import main as main_blueprint
     app.register_blueprint(main_blueprint)
 
+    from routes.public_routes import public_bp
+    app.register_blueprint(public_bp)
+
     # 6. Register CLI commands
     _register_cli(app)
 

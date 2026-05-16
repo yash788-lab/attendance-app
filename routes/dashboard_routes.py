@@ -11,9 +11,9 @@ from database import db
 from . import main
 
 
-@main.route('/')
+@main.route('/dashboard')
 @login_required
-def index():
+def dashboard():
     if current_user.role == 'admin':
         return redirect(url_for('main.admin_dashboard'))
 

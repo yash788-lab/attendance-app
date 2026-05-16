@@ -1,0 +1,21 @@
+{% extends 'layouts/public_base.html' %}
+{% block title %}Facilities - School Excellence{% endblock %}
+{% block content %}
+<div class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h1 class="text-4xl font-heading font-bold text-gray-900 mb-6">Our Facilities</h1>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <img src="https://images.unsplash.com/photo-1568667256549-094345857637?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Library" class="rounded-2xl shadow-lg w-full h-64 object-cover">
+            <div class="flex flex-col justify-center">
+                <h3 class="text-2xl font-bold mb-3">Modern Library</h3>
+                <p class="text-gray-600">A quiet space equipped with thousands of books, digital resources, and comfortable seating for focused studying.</p>
+            </div>
+            <img src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Sports" class="rounded-2xl shadow-lg w-full h-64 object-cover md:order-last">
+            <div class="flex flex-col justify-center">
+                <h3 class="text-2xl font-bold mb-3">Sports Complex</h3>
+                <p class="text-gray-600">Includes an indoor stadium, Olympic-size track, basketball courts, and professional training equipment.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

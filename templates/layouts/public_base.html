@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="School Excellence - Modern Education">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            900: '#312e81',
+                        },
+                        secondary: '#0ea5e9'
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .heading-text {
+                @apply font-heading font-bold text-gray-900 tracking-tight;
+            }
+            .nav-link {
+                @apply text-sm font-medium text-gray-600 hover:text-primary-600 transition-colors duration-200;
+            }
+            .btn-primary {
+                @apply inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-primary-600 hover:bg-primary-700 transition duration-200;
+            }
+            .btn-secondary {
+                @apply inline-flex items-center justify-center px-6 py-3 border border-gray-300 rounded-lg shadow-sm text-base font-medium text-gray-700 bg-white hover:bg-gray-50 transition duration-200;
+            }
+        }
+    </style>
+    <title>{% block title %}School Excellence{% endblock %}</title>
+</head>
+<body class="font-sans text-gray-600 bg-gray-50 antialiased flex flex-col min-h-screen">
+    <!-- Navbar -->
+    {% include 'components/navbar_public.html' %}
+
+    <!-- Flash Messages (if any) -->
+    <div class="fixed top-20 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-md">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="mb-2 p-4 rounded-lg shadow-lg text-sm font-medium text-white {% if category in ('error','danger') %}bg-red-500{% elif category == 'warning' %}bg-amber-500{% elif category == 'success' %}bg-green-500{% else %}bg-blue-500{% endif %} animate-fade-in-down flex items-center justify-between">
+                        <span>{{ message }}</span>
+                        <button onclick="this.parentElement.style.display='none'" class="text-white hover:text-gray-200 focus:outline-none">&times;</button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- Main Content -->
+    <main class="flex-grow">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    {% include 'components/footer_public.html' %}
+
+    <!-- Script for mobile menu -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+            const mobileMenu = document.getElementById('mobile-menu');
+            if(mobileMenuBtn && mobileMenu) {
+                mobileMenuBtn.addEventListener('click', () => {
+                    mobileMenu.classList.toggle('hidden');
+                });
+            }
+        });
+    </script>
+</body>
+</html>
