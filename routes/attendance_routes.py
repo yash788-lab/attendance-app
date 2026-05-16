@@ -1,13 +1,14 @@
 from flask import render_template, request, flash, redirect, url_for
 from flask_login import login_required, current_user
 from datetime import datetime, date
+from collections import defaultdict
 
 from models.student import Student
 from models.attendance import Attendance
 from models.academic import Class
 from database import db
 from . import main
-from utils.decorators import admin_or_teacher_required
+from utils.decorators import admin_or_teacher_required, student_required
 
 
 @main.route('/attendance/mark', methods=['GET', 'POST'])
@@ -132,3 +133,72 @@ def attendance_reports():
         end_date=end_date,
         report_data=report_data,
     )
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# STUDENT ATTENDANCE ANALYTICS
+# ─────────────────────────────────────────────────────────────────────────────
+@main.route('/attendance/analytics')
+@login_required
+@student_required
+def student_attendance():
+    student = current_user.student_profile
+    if not student:
+        from flask import abort
+        abort(403)
+
+    start_date = request.args.get('start_date')
+    end_date   = request.args.get('end_date')
+
+    query = Attendance.query.filter_by(student_id=student.id)
+    if start_date:
+        try:
+            query = query.filter(Attendance.date >= datetime.strptime(start_date, '%Y-%m-%d').date())
+        except ValueError:
+            start_date = None
+    if end_date:
+        try:
+            query = query.filter(Attendance.date <= datetime.strptime(end_date, '%Y-%m-%d').date())
+        except ValueError:
+            end_date = None
+
+    records = query.order_by(Attendance.date.desc()).all()
+
+    # Overall counts
+    present_count = sum(1 for r in records if r.status == 'present')
+    absent_count  = sum(1 for r in records if r.status == 'absent')
+    late_count    = sum(1 for r in records if r.status == 'late')
+    total_count   = len(records)
+    att_percent   = round((present_count / total_count) * 100, 1) if total_count else 0.0
+
+    # Monthly breakdown
+    monthly = defaultdict(lambda: {'present': 0, 'absent': 0, 'late': 0})
+    for r in sorted(records, key=lambda x: x.date):
+        key = r.date.strftime('%b %Y')
+        monthly[key][r.status] = monthly[key].get(r.status, 0) + 1
+
+    monthly_labels  = list(monthly.keys())
+    monthly_present = [monthly[k]['present'] for k in monthly_labels]
+    monthly_absent  = [monthly[k]['absent']  for k in monthly_labels]
+    monthly_late    = [monthly[k]['late']    for k in monthly_labels]
+
+    return render_template(
+        'student/attendance.html',
+        student=student,
+        records=records,
+        att_percent=att_percent,
+        present_count=present_count,
+        absent_count=absent_count,
+        late_count=late_count,
+        total_count=total_count,
+        monthly_data=monthly,
+        monthly_labels=monthly_labels,
+        monthly_present=monthly_present,
+        monthly_absent=monthly_absent,
+        monthly_late=monthly_late,
+        start_date=start_date,
+        end_date=end_date,
+    )
+
+
+

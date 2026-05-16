@@ -8,7 +8,79 @@ from . import main
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# UNIFIED LOGIN (Admin + Teacher + Student)
+# SHARED AUTH HELPER
+# ─────────────────────────────────────────────────────────────────────────────
+def _authenticate(email, password):
+    """Return (user, error_message). user is None on failure."""
+    user = User.query.filter_by(email=email.strip().lower()).first()
+    if not user or not user.check_password(password):
+        return None, 'Invalid email or password.'
+    if not user.is_active:
+        return None, 'Your account is inactive. Please contact the admin.'
+    return user, None
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# ADMIN LOGIN  (/admin/login)
+# ─────────────────────────────────────────────────────────────────────────────
+@main.route('/admin/login', methods=['GET', 'POST'])
+def admin_login():
+    if current_user.is_authenticated:
+        return redirect(url_for('main.index'))
+
+    if request.method == 'POST':
+        email    = request.form.get('email', '')
+        password = request.form.get('password', '')
+
+        user, err = _authenticate(email, password)
+        if err:
+            flash(err, 'error')
+            return render_template('auth/admin_login.html')
+
+        if user.role != 'admin':
+            flash('This portal is for administrators only. Please use the correct login page.', 'error')
+            return render_template('auth/admin_login.html')
+
+        login_user(user, remember=False)
+        return redirect(url_for('main.admin_dashboard'))
+
+    return render_template('auth/admin_login.html')
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# STUDENT LOGIN  (/student/login)
+# ─────────────────────────────────────────────────────────────────────────────
+@main.route('/student/login', methods=['GET', 'POST'])
+def student_login():
+    if current_user.is_authenticated:
+        return redirect(url_for('main.index'))
+
+    if request.method == 'POST':
+        email    = request.form.get('email', '')
+        password = request.form.get('password', '')
+
+        user, err = _authenticate(email, password)
+        if err:
+            flash(err, 'error')
+            return render_template('auth/student_login.html')
+
+        if user.role != 'student':
+            flash('This portal is for students only. Please use the correct login page.', 'error')
+            return render_template('auth/student_login.html')
+
+        login_user(user, remember=False)
+
+        if user.must_change_password:
+            flash('Please set a new password before continuing.', 'info')
+            return redirect(url_for('main.change_password'))
+
+        return redirect(url_for('main.index'))
+
+    return render_template('auth/student_login.html')
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# UNIFIED LOGIN — teachers + fallback  (/login)
 # ─────────────────────────────────────────────────────────────────────────────
 @main.route('/login', methods=['GET', 'POST'])
 def login():
@@ -16,28 +88,29 @@ def login():
         return redirect(url_for('main.index'))
 
     if request.method == 'POST':
-        email = request.form.get('email', '').strip().lower()
+        email    = request.form.get('email', '')
         password = request.form.get('password', '')
 
-        user = User.query.filter_by(email=email).first()
-
-        if not user or not user.check_password(password):
-            flash('Invalid email or password.', 'error')
+        user, err = _authenticate(email, password)
+        if err:
+            flash(err, 'error')
             return render_template('auth/login.html')
 
-        if not user.is_active:
-            flash('Your account is inactive. Please contact the admin.', 'warning')
-            return render_template('auth/login.html')
+        # Redirect to dedicated portal if not a teacher
+        if user.role == 'admin':
+            flash('Please use the Admin Login page.', 'info')
+            return redirect(url_for('main.admin_login'))
+        if user.role == 'student':
+            flash('Please use the Student Login page.', 'info')
+            return redirect(url_for('main.student_login'))
 
         # Teacher: must be approved
-        if user.role == 'teacher':
-            if not user.teacher_profile or not user.teacher_profile.is_approved:
-                flash('Your teacher account is pending admin approval.', 'warning')
-                return render_template('auth/login.html')
+        if not user.teacher_profile or not user.teacher_profile.is_approved:
+            flash('Your teacher account is pending admin approval.', 'warning')
+            return render_template('auth/login.html')
 
         login_user(user, remember=False)
 
-        # Redirect students who must change their password
         if user.must_change_password:
             flash('Please set a new password before continuing.', 'info')
             return redirect(url_for('main.change_password'))

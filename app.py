@@ -51,6 +51,15 @@ def create_app():
                 return redirect(url_for('main.login'))
         session['last_activity'] = now
 
+    @app.context_processor
+    def inject_global_data():
+        """Inject variables into all templates"""
+        data = {}
+        if current_user.is_authenticated and current_user.role == 'admin':
+            from models.teacher import Teacher
+            data['pending_teachers_count'] = Teacher.query.filter_by(is_approved=False).count()
+        return data
+
     # 5. Register Blueprints
     from routes import main as main_blueprint
     app.register_blueprint(main_blueprint)
