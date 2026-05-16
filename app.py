@@ -66,7 +66,8 @@ def load_user(user_id):
     from models.user import User
     try:
         return db.session.get(User, int(user_id))
-    except (ValueError, TypeError):
+    except Exception:
+        # Catch all exceptions (including DB missing tables) so the app doesn't crash on stale cookies
         return None
 
 
