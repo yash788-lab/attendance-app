@@ -20,9 +20,10 @@ def index():
     if current_user.role == 'teacher':
         total_students = Student.query.count()
         total_classes = Class.query.count()
-        pending_notifications = Notification.query.filter_by(
-            recipient_user_id=None, is_read=False
-        ).count()
+        pending_notifications = Notification.query.filter(
+            (Notification.recipient_user_id == current_user.id) |
+            (Notification.recipient_user_id == None)  # noqa: E711
+        ).filter_by(is_read=False).count()
         return render_template(
             'teacher/dashboard.html',
             total_students=total_students,

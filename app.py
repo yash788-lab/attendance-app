@@ -15,25 +15,27 @@ login_manager = LoginManager()
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
-    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-prod')
 
-    # 1. Init DB + Migrations
+    # 1. Init DB
     db.init_app(app)
 
-    # Import ALL models so Alembic can detect the full schema
-    with app.app_context():
-        import models  # noqa: F401 — side-effect import registers all tables
+    # Import ALL models here so SQLAlchemy registers them in metadata
+    # and Alembic can detect the full schema during `flask db migrate`
+    import models  # noqa: F401 — side-effect import registers all tables
 
+    # 2. Init Migrations (must come AFTER models are imported so Alembic sees them)
     migrate = Migrate(app, db)
 
-    # 2. Login Manager
+    # 3. Login Manager
     login_manager.init_app(app)
     login_manager.login_view = 'main.login'
     login_manager.login_message = 'Please log in to access this page.'
     login_manager.login_message_category = 'warning'
-    login_manager.session_protection = 'strong'
+    # Use 'basic' instead of 'strong' — Render runs behind a reverse proxy which
+    # can change the apparent client IP, causing 'strong' to invalidate sessions.
+    login_manager.session_protection = 'basic'
 
-    # 3. Session / inactivity timeout
+    # 4. Session / inactivity timeout
     @app.before_request
     def session_management():
         if not current_user.is_authenticated:
@@ -49,14 +51,15 @@ def create_app():
                 return redirect(url_for('main.login'))
         session['last_activity'] = now
 
-    # 4. Register Blueprints
+    # 5. Register Blueprints
     from routes import main as main_blueprint
     app.register_blueprint(main_blueprint)
 
-    # 5. Register CLI commands
+    # 6. Register CLI commands
     _register_cli(app)
 
     return app
+
 
 
 # ── USER LOADER ───────────────────────────────────────────────────────────────

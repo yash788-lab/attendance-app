@@ -140,71 +140,120 @@ def logout():
 
 
 # ─────────────────────────────────────────────────────────────────────────────
-# RENDER SETUP ROUTE (ONE-TIME USE)
+# RENDER SETUP ROUTE (ONE-TIME USE — run after first deploy)
 # ─────────────────────────────────────────────────────────────────────────────
 @main.route('/setup-render-db')
 def setup_render_db():
     """
-    Emergency route to reset and migrate the database on Render 
-    without needing shell access. This will drop all tables and re-create them.
+    One-time setup route for Render deployments without shell access.
+    Drops all tables, runs flask db upgrade, then seeds default data + admin.
+    Visit /setup-render-db ONCE after first deploy, then never again.
     """
-    try:
-        from database import db
-        from sqlalchemy import text
-        import traceback
+    from flask import current_app
+    from database import db
+    from sqlalchemy import text
+    from flask_migrate import upgrade
+    import traceback
 
-        # 1. WIPE THE DATABASE (PostgreSQL specific)
+    log = []
+
+    def step(label, fn):
         try:
-            db.session.execute(text("DROP SCHEMA public CASCADE;"))
-            db.session.execute(text("CREATE SCHEMA public;"))
+            fn()
+            log.append(f'<li style="color:#10b981">✅ {label}</li>')
+            return True
+        except Exception as exc:
+            log.append(
+                f'<li style="color:#ef4444">❌ {label}: {exc}'
+                f'<pre style="font-size:.75rem;white-space:pre-wrap">{traceback.format_exc()}</pre></li>'
+            )
+            return False
+
+    # ── 1. Wipe schema ────────────────────────────────────────────────────────
+    def wipe():
+        try:
+            db.session.execute(text('DROP SCHEMA public CASCADE;'))
+            db.session.execute(text('CREATE SCHEMA public;'))
             db.session.commit()
         except Exception:
             db.session.rollback()
-            # Fallback for SQLite locally
+            # SQLite fallback
             db.drop_all()
-            try:
-                db.session.execute(text("DROP TABLE IF EXISTS alembic_version;"))
-                db.session.commit()
-            except Exception:
-                db.session.rollback()
-        
-        # 2. Run alembic upgrade
-        from flask_migrate import upgrade
-        upgrade()
-        
-        # 3. Seed data
-        from models.academic import Class, Subject, Exam
+
+    step('Wipe existing schema', wipe)
+
+    # Close the current session cleanly so upgrade() gets a fresh connection
+    db.session.remove()
+
+    # ── 2. Run migrations ─────────────────────────────────────────────────────
+    ok = step('Run flask db upgrade', lambda: upgrade())
+    if not ok:
+        html = f'<ul>{"".join(log)}</ul>'
+        return f'<h2>Setup failed at migration step</h2>{html}', 500
+
+    # ── 3. Seed Classes ───────────────────────────────────────────────────────
+    def seed_classes():
+        from models.academic import Class
         if not Class.query.first():
-            for name in ['5', '6', '7', '8', '9', '10', '11-Maths', '11-Science', '12-Maths', '12-Science']:
+            for name in ['5', '6', '7', '8', '9', '10',
+                         '11-Maths', '11-Science', '12-Maths', '12-Science']:
                 db.session.add(Class(name=name))
             db.session.commit()
 
+    step('Seed default classes', seed_classes)
+
+    # ── 4. Seed Subjects ──────────────────────────────────────────────────────
+    def seed_subjects():
+        from models.academic import Subject
         if not Subject.query.first():
             for name, code in [
                 ('Mathematics', 'MATH'), ('Science', 'SCI'), ('English', 'ENG'),
                 ('History', 'HIST'), ('Physics', 'PHY'), ('Chemistry', 'CHEM'),
+                ('Biology', 'BIO'), ('Computer Science', 'CS'),
             ]:
                 db.session.add(Subject(name=name, code=code))
             db.session.commit()
 
+    step('Seed default subjects', seed_subjects)
+
+    # ── 5. Seed Exams ─────────────────────────────────────────────────────────
+    def seed_exams():
+        from models.academic import Exam
         if not Exam.query.first():
             for name in ['Unit Test 1', 'Unit Test 2', 'Mid-Term', 'Final Exam']:
                 db.session.add(Exam(name=name, term='2025-26'))
             db.session.commit()
 
-        # 4. Seed admin
+    step('Seed default exam types', seed_exams)
+
+    # ── 6. Seed Admin account ─────────────────────────────────────────────────
+    def seed_admin():
         from models.user import User, Admin
         if not User.query.filter_by(email='admin@school.edu').first():
             user = User(email='admin@school.edu', role='admin', is_active=True)
             user.set_password('admin123')
             db.session.add(user)
             db.session.flush()
-            admin = Admin(user_id=user.id, name='Super Admin')
-            db.session.add(admin)
+            db.session.add(Admin(user_id=user.id, name='Super Admin'))
             db.session.commit()
 
-        return "✅ Render Setup Complete! Database has been reset, migrated, and seeded. You can now login at /login with admin@school.edu and password admin123."
+    step('Seed admin account (admin@school.edu / admin123)', seed_admin)
 
-    except Exception as e:
-        import traceback
-        return f"❌ Error during setup: {str(e)}<br><pre>{traceback.format_exc()}</pre>", 500
+    # ── Done ──────────────────────────────────────────────────────────────────
+    html = f'''<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<title>Render Setup</title>
+<style>body{{font-family:system-ui;max-width:700px;margin:40px auto;padding:0 20px;}}
+ul{{list-style:none;padding:0;line-height:2;}}
+pre{{background:#f1f5f9;padding:8px;border-radius:4px;overflow:auto;}}
+</style></head><body>
+<h1>🏫 School ERP — Render Setup</h1>
+<ul>{"".join(log)}</ul>
+<hr>
+<p>✅ Setup complete. <a href="/login">Go to Login →</a></p>
+<p style="color:#64748b;font-size:.85rem">
+  Default admin credentials: <strong>admin@school.edu</strong> / <strong>admin123</strong><br>
+  ⚠️ Change the admin password immediately after first login.
+</p>
+</body></html>'''
+    return html

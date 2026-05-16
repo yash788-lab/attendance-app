@@ -1,14 +1,19 @@
 import os
 
+
 class Config:
-    db_url = os.getenv("DATABASE_URL")
+    # ── Security ──────────────────────────────────────────────────────────────
+    SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-prod')
 
-    # Render uses "postgres://", but SQLAlchemy 1.4+ requires "postgresql://"
-    if db_url:
-        if db_url.startswith("postgres://"):
-            db_url = db_url.replace("postgres://", "postgresql+pg8000://", 1)
-        elif db_url.startswith("postgresql://"):
-            db_url = db_url.replace("postgresql://", "postgresql+pg8000://", 1)
+    # ── Database ──────────────────────────────────────────────────────────────
+    _db_url = os.getenv('DATABASE_URL', '')
 
-    SQLALCHEMY_DATABASE_URI = db_url or "sqlite:///attendance.db"
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    # Render provides "postgres://..." — SQLAlchemy 1.4+ requires "postgresql://"
+    # We also force the pg8000 driver which is pure-Python (no libpq needed on Render)
+    if _db_url.startswith('postgres://'):
+        _db_url = _db_url.replace('postgres://', 'postgresql+pg8000://', 1)
+    elif _db_url.startswith('postgresql://') and '+' not in _db_url.split('://')[0]:
+        _db_url = _db_url.replace('postgresql://', 'postgresql+pg8000://', 1)
+
+    SQLALCHEMY_DATABASE_URI = _db_url or 'sqlite:///attendance.db'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False

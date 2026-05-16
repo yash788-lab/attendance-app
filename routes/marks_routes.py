@@ -81,7 +81,18 @@ def manage_marks():
         db.session.commit()
         flash('Marks updated successfully!', 'success')
 
-    return render_template('teacher/manage_marks.html', **locals())
+    return render_template(
+        'teacher/manage_marks.html',
+        classes=classes,
+        subjects=subjects,
+        exams=exams,
+        class_id=class_id,
+        subject_id=subject_id,
+        exam_id=exam_id,
+        students_list=students_list,
+        existing_marks=existing_marks,
+        existing_max_marks=existing_max_marks,
+    )
 
 
 @main.route('/marks/student')
