@@ -2,7 +2,8 @@
 # Central import hub — import all models so SQLAlchemy can build the full relationship graph
 # and Alembic can detect all tables.
 
-from models.user import User, Admin
+from models.user import User
+from models.admin import Admin
 from models.teacher import Teacher
 from models.student import Student
 from models.academic import Class, Subject, ClassSubject, Exam

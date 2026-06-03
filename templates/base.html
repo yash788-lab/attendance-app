@@ -330,72 +330,81 @@
         <nav class="sidebar-nav">
             {% if current_user.is_authenticated %}
                 <span class="nav-section-label">Main</span>
-                <a href="{{ url_for('main.index') }}" class="{{ 'active' if request.path == '/' }}">
+                <a href="{{ url_for('public.home') }}" class="{{ 'active' if request.path == '/' }}">
                     <span class="nav-icon">🏠</span> Dashboard
                 </a>
 
                 {% if current_user.role == 'admin' %}
                     <span class="nav-section-label">Administration</span>
-                    <a href="{{ url_for('main.admin_dashboard') }}">
+                    <a href="{{ url_for('admin.admin_dashboard') }}">
                         <span class="nav-icon">⚙️</span> Admin Panel
                     </a>
-                    <a href="{{ url_for('main.admin_students') }}">
+                    <a href="{{ url_for('admin.admin_students') }}">
                         <span class="nav-icon">👥</span> Students
                     </a>
-                    <a href="{{ url_for('main.admin_teachers') }}">
+                    <a href="{{ url_for('admin.admin_teachers') }}">
                         <span class="nav-icon">👨‍🏫</span> Teachers
                         {% if pending_teachers_count %}
                         <span style="margin-left:auto;background:var(--danger);color:white;border-radius:10px;padding:2px 6px;font-size:.7rem;font-weight:700;">{{ pending_teachers_count }}</span>
                         {% endif %}
                     </a>
-                    <a href="{{ url_for('main.admin_classes') }}">
+                    <a href="{{ url_for('admin.admin_classes') }}">
                         <span class="nav-icon">🏛️</span> Classes
                     </a>
-                    <a href="{{ url_for('main.admin_subjects') }}">
+                    <a href="{{ url_for('admin.admin_subjects') }}">
                         <span class="nav-icon">📚</span> Subjects
                     </a>
-                    <a href="{{ url_for('main.admin_exams') }}">
+                    <a href="{{ url_for('admin.admin_exams') }}">
                         <span class="nav-icon">📝</span> Exams
+                    </a>
+                    <a href="{{ url_for('admin.admin_cms') }}">
+                        <span class="nav-icon">📢</span> CMS / Content
                     </a>
 
                 {% elif current_user.role == 'teacher' %}
                     <span class="nav-section-label">Teaching</span>
-                    <a href="{{ url_for('main.students') }}">
+                    <a href="{{ url_for('teacher.students') }}">
                         <span class="nav-icon">👥</span> Students
                     </a>
-                    <a href="{{ url_for('main.mark_attendance') }}">
+                    <a href="{{ url_for('teacher.mark_attendance') }}">
                         <span class="nav-icon">📅</span> Attendance
                     </a>
-                    <a href="{{ url_for('main.attendance_reports') }}">
+                    <a href="{{ url_for('teacher.attendance_reports') }}">
                         <span class="nav-icon">📊</span> Reports
                     </a>
-                    <a href="{{ url_for('main.manage_marks') }}">
+                    <a href="{{ url_for('teacher.manage_marks') }}">
                         <span class="nav-icon">🎯</span> Marks
+                    </a>
+                    <a href="{{ url_for('teacher.manage_homework') }}">
+                        <span class="nav-icon">📚</span> Homework
                     </a>
 
                 {% elif current_user.role == 'student' %}
                     <span class="nav-section-label">My Academics</span>
-                    <a href="{{ url_for('main.student_marks') }}">
+                    <a href="{{ url_for('teacher.student_marks') }}">
                         <span class="nav-icon">🎯</span> My Marks
                     </a>
-                    <a href="{{ url_for('main.student_attendance') }}">
+                    <a href="{{ url_for('teacher.student_attendance') }}">
                         <span class="nav-icon">📊</span> My Attendance
+                    </a>
+                    <a href="{{ url_for('student.view_homework') }}">
+                        <span class="nav-icon">📚</span> Homework
                     </a>
                 {% endif %}
 
                 <div class="nav-divider"></div>
                 <span class="nav-section-label">General</span>
-                <a href="{{ url_for('main.view_notifications') }}">
+                <a href="{{ url_for('teacher.view_notifications') }}">
                     <span class="nav-icon">🔔</span> Notifications
                 </a>
-                <a href="{{ url_for('main.change_password') }}">
+                <a href="{{ url_for('auth.change_password') }}">
                     <span class="nav-icon">🔐</span> Change Password
                 </a>
             {% else %}
-                <a href="{{ url_for('main.login') }}">
+                <a href="{{ url_for('auth.login') }}">
                     <span class="nav-icon">🔑</span> Login
                 </a>
-                <a href="{{ url_for('main.teacher_register') }}">
+                <a href="{{ url_for('auth.teacher_register') }}">
                     <span class="nav-icon">📝</span> Teacher Register
                 </a>
             {% endif %}
@@ -403,7 +412,7 @@
 
         {% if current_user.is_authenticated %}
         <div class="sidebar-footer">
-            <a href="{{ url_for('main.logout') }}">🚪 Logout</a>
+            <a href="{{ url_for('auth.logout') }}">🚪 Logout</a>
         </div>
         {% endif %}
     </aside>

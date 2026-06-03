@@ -4,17 +4,17 @@ from flask_login import login_required, current_user
 from models.student import Student
 from models.academic import Class
 from database import db
-from . import main
+from . import teacher_bp
 from utils.decorators import admin_or_teacher_required
 
 
 # Teacher/Admin: view all students (redirects admin to admin panel)
-@main.route('/students')
+@teacher_bp.route('/students')
 @login_required
 @admin_or_teacher_required
 def students():
     if current_user.role == 'admin':
-        return redirect(url_for('main.admin_students'))
+        return redirect(url_for('admin.admin_students'))
     students = (
         Student.query
         .join(Class)
@@ -25,16 +25,16 @@ def students():
 
 
 # Legacy redirect: old /student/add goes to admin panel
-@main.route('/student/add', methods=['GET', 'POST'])
+@teacher_bp.route('/student/add', methods=['GET', 'POST'])
 @login_required
 @admin_or_teacher_required
 def add_student():
-    return redirect(url_for('main.admin_add_student'))
+    return redirect(url_for('admin.admin_add_student'))
 
 
 # Legacy redirect: old /student/delete goes to admin panel
-@main.route('/student/delete/<int:student_id>', methods=['POST'])
+@teacher_bp.route('/student/delete/<int:student_id>', methods=['POST'])
 @login_required
 @admin_or_teacher_required
 def delete_student(student_id):
-    return redirect(url_for('main.admin_delete_student', student_id=student_id))
+    return redirect(url_for('admin.admin_delete_student', student_id=student_id))

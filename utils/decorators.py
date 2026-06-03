@@ -22,7 +22,7 @@ def teacher_required(f):
         # Extra check: teacher must be approved by admin
         if current_user.teacher_profile and not current_user.teacher_profile.is_approved:
             flash('Your account is pending admin approval.', 'warning')
-            return redirect(url_for('main.login'))
+            return redirect(url_for('auth.login'))
         return f(*args, **kwargs)
     return decorated
 
@@ -38,7 +38,7 @@ def admin_or_teacher_required(f):
         if current_user.role == 'teacher':
             if current_user.teacher_profile and not current_user.teacher_profile.is_approved:
                 flash('Your account is pending admin approval.', 'warning')
-                return redirect(url_for('main.login'))
+                return redirect(url_for('auth.login'))
         return f(*args, **kwargs)
     return decorated
 

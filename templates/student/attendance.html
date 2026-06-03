@@ -112,7 +112,7 @@
     </div>
 
     <!-- Filter form -->
-    <form method="GET" action="{{ url_for('main.student_attendance') }}"
+    <form method="GET" action="{{ url_for('teacher.student_attendance') }}"
           style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid var(--border);">
         <div style="flex:1;min-width:140px;">
             <label style="font-size:.8rem;color:var(--text-muted);margin-bottom:4px;display:block;">From</label>
@@ -126,7 +126,7 @@
         </div>
         <div style="display:flex;align-items:flex-end;gap:8px;">
             <button type="submit" class="btn btn-primary btn-sm">Filter</button>
-            <a href="{{ url_for('main.student_attendance') }}" class="btn btn-outline btn-sm">Reset</a>
+            <a href="{{ url_for('teacher.student_attendance') }}" class="btn btn-outline btn-sm">Reset</a>
         </div>
     </form>
 

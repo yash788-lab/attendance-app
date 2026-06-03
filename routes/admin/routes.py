@@ -1,19 +1,20 @@
 from flask import render_template, request, redirect, url_for, flash
 from flask_login import login_required
 
-from models.user import User, Admin
+from models.user import User
+from models.admin import Admin
 from models.teacher import Teacher
 from models.student import Student
 from models.academic import Class, Subject, Exam
 from database import db
-from . import main
+from . import admin_bp
 from utils.decorators import admin_required
 
 
 # ─────────────────────────────────────────────────────────────────────────────
 # ADMIN DASHBOARD
 # ─────────────────────────────────────────────────────────────────────────────
-@main.route('/admin/dashboard')
+@admin_bp.route('/admin/dashboard')
 @login_required
 @admin_required
 def admin_dashboard():
@@ -41,7 +42,7 @@ def admin_dashboard():
 # ─────────────────────────────────────────────────────────────────────────────
 # TEACHER APPROVAL
 # ─────────────────────────────────────────────────────────────────────────────
-@main.route('/admin/teachers')
+@admin_bp.route('/admin/teachers')
 @login_required
 @admin_required
 def admin_teachers():
@@ -50,41 +51,78 @@ def admin_teachers():
     return render_template('admin/teachers.html', approved=approved, pending=pending)
 
 
-@main.route('/admin/teacher/<int:teacher_id>/approve', methods=['POST'])
+@admin_bp.route('/admin/teacher/<int:teacher_id>/approve', methods=['POST'])
 @login_required
 @admin_required
 def approve_teacher(teacher_id):
     teacher = db.session.get(Teacher, teacher_id)
     if not teacher:
         flash('Teacher not found.', 'error')
-        return redirect(url_for('main.admin_teachers'))
+        return redirect(url_for('admin.admin_teachers'))
     teacher.is_approved = True
     teacher.user.is_active = True
     db.session.commit()
     flash(f'{teacher.name} has been approved and can now log in.', 'success')
-    return redirect(url_for('main.admin_teachers'))
+    return redirect(url_for('admin.admin_teachers'))
 
 
-@main.route('/admin/teacher/<int:teacher_id>/reject', methods=['POST'])
+@admin_bp.route('/admin/teacher/<int:teacher_id>/reject', methods=['POST'])
 @login_required
 @admin_required
 def reject_teacher(teacher_id):
     teacher = db.session.get(Teacher, teacher_id)
     if not teacher:
         flash('Teacher not found.', 'error')
-        return redirect(url_for('main.admin_teachers'))
+        return redirect(url_for('admin.admin_teachers'))
     user = teacher.user
     db.session.delete(teacher)
     db.session.delete(user)
     db.session.commit()
     flash('Teacher registration rejected and removed.', 'info')
-    return redirect(url_for('main.admin_teachers'))
+    return redirect(url_for('admin.admin_teachers'))
+
+
+@admin_bp.route('/admin/teacher/<int:teacher_id>/delete', methods=['POST'])
+@login_required
+@admin_required
+def admin_delete_teacher(teacher_id):
+    teacher = db.session.get(Teacher, teacher_id)
+    if not teacher:
+        flash('Teacher not found.', 'error')
+        return redirect(url_for('admin.admin_teachers'))
+    name = teacher.name
+    user = teacher.user
+
+    # Clean up assignments, attendance marked reference, marks entered reference, and homework
+    from models.academic import ClassSubject
+    from models.attendance import Attendance
+    from models.marks import Mark
+    from models.homework import Homework
+    from models.communication import Announcement, Event, Poll, PollVote
+
+    ClassSubject.query.filter_by(teacher_id=teacher.id).update({ClassSubject.teacher_id: None})
+    Attendance.query.filter_by(marked_by=teacher.id).update({Attendance.marked_by: None})
+    Mark.query.filter_by(entered_by=teacher.id).update({Mark.entered_by: None})
+    Homework.query.filter_by(teacher_id=teacher.id).delete()
+
+    if user:
+        Announcement.query.filter_by(created_by=user.id).delete()
+        Event.query.filter_by(created_by=user.id).delete()
+        PollVote.query.filter_by(user_id=user.id).delete()
+        Poll.query.filter_by(created_by=user.id).delete()
+        db.session.delete(user)
+    else:
+        db.session.delete(teacher)
+
+    db.session.commit()
+    flash(f'Teacher {name} has been permanently removed.', 'success')
+    return redirect(url_for('admin.admin_teachers'))
 
 
 # ─────────────────────────────────────────────────────────────────────────────
 # STUDENT MANAGEMENT (admin view)
 # ─────────────────────────────────────────────────────────────────────────────
-@main.route('/admin/students')
+@admin_bp.route('/admin/students')
 @login_required
 @admin_required
 def admin_students():
@@ -98,7 +136,7 @@ def admin_students():
                            classes=classes, selected_class=class_id)
 
 
-@main.route('/admin/student/add', methods=['GET', 'POST'])
+@admin_bp.route('/admin/student/add', methods=['GET', 'POST'])
 @login_required
 @admin_required
 def admin_add_student():
@@ -119,8 +157,12 @@ def admin_add_student():
         db.session.add(student)
         db.session.flush()
 
-        # Auto-create User account (password = roll_number)
-        if not User.query.filter_by(email=email).first():
+        # Auto-create User account (password = roll_number), or link existing one
+        existing_user = User.query.filter_by(email=email).first()
+        if existing_user:
+            # Link student to the already-existing user account
+            student.user_id = existing_user.id
+        else:
             user = User(email=email, role='student', is_active=True, must_change_password=True)
             user.set_password(roll_number)
             db.session.add(user)
@@ -129,31 +171,31 @@ def admin_add_student():
 
         db.session.commit()
         flash(f'Student {name} added. Default password is their roll number.', 'success')
-        return redirect(url_for('main.admin_students'))
+        return redirect(url_for('admin.admin_students'))
 
     return render_template('admin/add_student.html', classes=classes)
 
 
-@main.route('/admin/student/<int:student_id>/delete', methods=['POST'])
+@admin_bp.route('/admin/student/<int:student_id>/delete', methods=['POST'])
 @login_required
 @admin_required
 def admin_delete_student(student_id):
     student = db.session.get(Student, student_id)
     if not student:
         flash('Student not found.', 'error')
-        return redirect(url_for('main.admin_students'))
+        return redirect(url_for('admin.admin_students'))
     name = student.name
     # Cascade deletes attendance + marks via relationship
     db.session.delete(student)
     db.session.commit()
     flash(f'Student {name} deleted.', 'success')
-    return redirect(url_for('main.admin_students'))
+    return redirect(url_for('admin.admin_students'))
 
 
 # ─────────────────────────────────────────────────────────────────────────────
 # SYSTEM MANAGEMENT (Classes, Subjects, Exams)
 # ─────────────────────────────────────────────────────────────────────────────
-@main.route('/admin/classes')
+@admin_bp.route('/admin/classes')
 @login_required
 @admin_required
 def admin_classes():
@@ -161,7 +203,7 @@ def admin_classes():
     return render_template('admin/classes.html', classes=classes)
 
 
-@main.route('/admin/class/add', methods=['POST'])
+@admin_bp.route('/admin/class/add', methods=['POST'])
 @login_required
 @admin_required
 def admin_add_class():
@@ -174,10 +216,39 @@ def admin_add_class():
             db.session.add(Class(name=name, academic_year=academic_year))
             db.session.commit()
             flash(f'Class "{name}" added.', 'success')
-    return redirect(url_for('main.admin_classes'))
+    return redirect(url_for('admin.admin_classes'))
 
 
-@main.route('/admin/subjects')
+@admin_bp.route('/admin/class/<int:class_id>/delete', methods=['POST'])
+@login_required
+@admin_required
+def admin_delete_class(class_id):
+    class_ = db.session.get(Class, class_id)
+    if not class_:
+        flash('Class not found.', 'error')
+        return redirect(url_for('admin.admin_classes'))
+
+    if class_.students:
+        flash(f'Cannot delete class "{class_.name}" because it contains enrolled students. Please reassign or remove the students first.', 'error')
+        return redirect(url_for('admin.admin_classes'))
+
+    # Clean up related records
+    from models.academic import ClassSubject
+    from models.homework import Homework
+    from models.communication import Announcement
+
+    ClassSubject.query.filter_by(class_id=class_.id).delete()
+    Homework.query.filter_by(class_id=class_.id).delete()
+    Announcement.query.filter_by(target_class_id=class_.id).update({Announcement.target_class_id: None})
+
+    name = class_.name
+    db.session.delete(class_)
+    db.session.commit()
+    flash(f'Class "{name}" deleted successfully.', 'success')
+    return redirect(url_for('admin.admin_classes'))
+
+
+@admin_bp.route('/admin/subjects')
 @login_required
 @admin_required
 def admin_subjects():
@@ -185,7 +256,7 @@ def admin_subjects():
     return render_template('admin/subjects.html', subjects=subjects)
 
 
-@main.route('/admin/subject/add', methods=['POST'])
+@admin_bp.route('/admin/subject/add', methods=['POST'])
 @login_required
 @admin_required
 def admin_add_subject():
@@ -195,10 +266,10 @@ def admin_add_subject():
         db.session.add(Subject(name=name, code=code))
         db.session.commit()
         flash(f'Subject "{name}" added.', 'success')
-    return redirect(url_for('main.admin_subjects'))
+    return redirect(url_for('admin.admin_subjects'))
 
 
-@main.route('/admin/exams')
+@admin_bp.route('/admin/exams')
 @login_required
 @admin_required
 def admin_exams():
@@ -206,7 +277,7 @@ def admin_exams():
     return render_template('admin/exams.html', exams=exams)
 
 
-@main.route('/admin/exam/add', methods=['POST'])
+@admin_bp.route('/admin/exam/add', methods=['POST'])
 @login_required
 @admin_required
 def admin_add_exam():
@@ -216,4 +287,4 @@ def admin_add_exam():
         db.session.add(Exam(name=name, term=term))
         db.session.commit()
         flash(f'Exam "{name}" added.', 'success')
-    return redirect(url_for('main.admin_exams'))
+    return redirect(url_for('admin.admin_exams'))

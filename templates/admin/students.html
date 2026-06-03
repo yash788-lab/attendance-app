@@ -7,7 +7,7 @@
         <h2>👥 Students</h2>
         <p>{{ students|length }} students{{ ' in selected class' if selected_class else ' total' }}</p>
     </div>
-    <a href="{{ url_for('main.admin_add_student') }}" class="btn btn-primary">+ Add Student</a>
+    <a href="{{ url_for('admin.admin_add_student') }}" class="btn btn-primary">+ Add Student</a>
 </div>
 
 <!-- Filter -->
@@ -22,6 +22,17 @@
                 {% endfor %}
             </select>
         </div>
+        {% if selected_class %}
+        <div style="display:flex;gap:8px;margin-bottom:4px;">
+            <a href="{{ url_for('teacher.mark_attendance', class_id=selected_class) }}" class="btn btn-outline btn-sm">Edit Attendance</a>
+            <a href="{{ url_for('teacher.manage_marks', class_id=selected_class) }}" class="btn btn-outline btn-sm">Edit Marks</a>
+        </div>
+        {% else %}
+        <div style="display:flex;gap:8px;margin-bottom:4px;">
+            <a href="{{ url_for('teacher.mark_attendance') }}" class="btn btn-outline btn-sm">Manage Attendance</a>
+            <a href="{{ url_for('teacher.manage_marks') }}" class="btn btn-outline btn-sm">Manage Marks</a>
+        </div>
+        {% endif %}
     </form>
 </div>
 
@@ -48,7 +59,7 @@
                         {% endif %}
                     </td>
                     <td>
-                        <form method="POST" action="{{ url_for('main.admin_delete_student', student_id=s.id) }}"
+                        <form method="POST" action="{{ url_for('admin.admin_delete_student', student_id=s.id) }}"
                               onsubmit="return confirm('Delete {{ s.name }}? This removes all their attendance and marks.')">
                             <button class="btn btn-danger btn-sm">Delete</button>
                         </form>

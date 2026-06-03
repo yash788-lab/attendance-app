@@ -7,11 +7,11 @@ from models.student import Student
 from models.attendance import Attendance
 from models.academic import Class
 from database import db
-from . import main
+from . import teacher_bp
 from utils.decorators import admin_or_teacher_required, student_required
 
 
-@main.route('/attendance/mark', methods=['GET', 'POST'])
+@teacher_bp.route('/attendance/mark', methods=['GET', 'POST'])
 @login_required
 @admin_or_teacher_required
 def mark_attendance():
@@ -71,7 +71,7 @@ def mark_attendance():
 
         db.session.commit()
         flash('Attendance saved successfully!', 'success')
-        return redirect(url_for('main.mark_attendance',
+        return redirect(url_for('teacher.mark_attendance',
                                 date=selected_date.strftime('%Y-%m-%d'),
                                 class_id=selected_class_id or ''))
 
@@ -85,7 +85,7 @@ def mark_attendance():
     )
 
 
-@main.route('/attendance/view')
+@teacher_bp.route('/attendance/view')
 @login_required
 def view_attendance():
     if current_user.role == 'student':
@@ -102,7 +102,7 @@ def view_attendance():
     return render_template('shared/view_attendance.html', records=records)
 
 
-@main.route('/attendance/reports')
+@teacher_bp.route('/attendance/reports')
 @login_required
 @admin_or_teacher_required
 def attendance_reports():
@@ -138,7 +138,7 @@ def attendance_reports():
 # ─────────────────────────────────────────────────────────────────────────────
 # STUDENT ATTENDANCE ANALYTICS
 # ─────────────────────────────────────────────────────────────────────────────
-@main.route('/attendance/analytics')
+@teacher_bp.route('/attendance/analytics')
 @login_required
 @student_required
 def student_attendance():

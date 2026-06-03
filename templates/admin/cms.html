@@ -1,0 +1,186 @@
+{% extends "layouts/dashboard_base.html" %}
+{% block title %}CMS Admin — KhelGaon Public School{% endblock %}
+{% block page_title %}CMS Administration{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h2>📢 Content Management System</h2>
+    <p>Manage announcements, events, and polls visible on the frontend.</p>
+</div>
+
+<!-- ANNOUNCEMENTS -->
+<div class="card" style="margin-bottom:32px;">
+    <div class="card-header">
+        <h3 class="card-title">📣 Announcements & Circulars</h3>
+    </div>
+    
+    <form method="POST" action="{{ url_for('admin.admin_add_announcement') }}" class="form-grid" style="margin-bottom:24px;border-bottom:1px solid var(--border);padding-bottom:24px;">
+        <div class="form-group" style="grid-column:1 / -1;">
+            <label>Title</label>
+            <input type="text" name="title" class="form-control" placeholder="E.g. Holiday on Friday" required>
+        </div>
+        <div class="form-group" style="grid-column:1 / -1;">
+            <label>Content</label>
+            <textarea name="content" class="form-control" rows="3" placeholder="Announcement details..." required></textarea>
+        </div>
+        <div class="form-group">
+            <label>Target Audience</label>
+            <select name="target_role" class="form-control">
+                <option value="all">Everyone</option>
+                <option value="student">Students Only</option>
+                <option value="teacher">Teachers Only</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Target Class (Optional)</label>
+            <select name="target_class_id" class="form-control">
+                <option value="">All Classes</option>
+                {% for c in classes %}
+                <option value="{{ c.id }}">Class {{ c.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-group" style="display:flex;align-items:center;gap:8px;margin-top:24px;">
+            <input type="checkbox" name="is_pinned" id="is_pinned">
+            <label for="is_pinned" style="margin:0;">Pin to top (Homepage)</label>
+        </div>
+        <div class="form-group" style="display:flex;align-items:flex-end;justify-content:flex-end;">
+            <button type="submit" class="btn btn-primary">Publish</button>
+        </div>
+    </form>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr><th>Date</th><th>Title</th><th>Audience</th><th>Pinned</th><th>Action</th></tr>
+            </thead>
+            <tbody>
+                {% for ann in announcements %}
+                <tr>
+                    <td>{{ ann.created_at.strftime('%Y-%m-%d') }}</td>
+                    <td><strong>{{ ann.title }}</strong></td>
+                    <td>{{ ann.target_role|capitalize }} {{ '(Class ' ~ ann.target_class.name ~ ')' if ann.target_class else '' }}</td>
+                    <td>{{ '⭐' if ann.is_pinned else '—' }}</td>
+                    <td>
+                        <form method="POST" action="{{ url_for('admin.admin_delete_announcement', ann_id=ann.id) }}" onsubmit="return confirm('Delete announcement?');">
+                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="5" style="text-align:center;color:var(--text-muted);">No announcements yet.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- EVENTS -->
+<div class="card" style="margin-bottom:32px;">
+    <div class="card-header">
+        <h3 class="card-title">📅 Events</h3>
+    </div>
+    
+    <form method="POST" action="{{ url_for('admin.admin_add_event') }}" class="form-grid" style="margin-bottom:24px;border-bottom:1px solid var(--border);padding-bottom:24px;">
+        <div class="form-group">
+            <label>Event Title</label>
+            <input type="text" name="title" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label>Event Date</label>
+            <input type="date" name="event_date" class="form-control" required>
+        </div>
+        <div class="form-group" style="grid-column:1 / -1;">
+            <label>Location</label>
+            <input type="text" name="location" class="form-control" placeholder="E.g. Main Auditorium">
+        </div>
+        <div class="form-group" style="grid-column:1 / -1;">
+            <label>Description</label>
+            <textarea name="description" class="form-control" rows="2"></textarea>
+        </div>
+        <div class="form-group" style="grid-column:1 / -1;display:flex;justify-content:flex-end;">
+            <button type="submit" class="btn btn-primary">Add Event</button>
+        </div>
+    </form>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr><th>Date</th><th>Title</th><th>Location</th><th>Action</th></tr>
+            </thead>
+            <tbody>
+                {% for ev in events %}
+                <tr>
+                    <td>{{ ev.event_date.strftime('%Y-%m-%d') }}</td>
+                    <td><strong>{{ ev.title }}</strong></td>
+                    <td>{{ ev.location or '—' }}</td>
+                    <td>
+                        <form method="POST" action="{{ url_for('admin.admin_delete_event', event_id=ev.id) }}" onsubmit="return confirm('Delete event?');">
+                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="4" style="text-align:center;color:var(--text-muted);">No events scheduled.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- POLLS -->
+<div class="card">
+    <div class="card-header">
+        <h3 class="card-title">📊 Polls</h3>
+    </div>
+    
+    <form method="POST" action="{{ url_for('admin.admin_add_poll') }}" class="form-grid" style="margin-bottom:24px;border-bottom:1px solid var(--border);padding-bottom:24px;">
+        <div class="form-group" style="grid-column:1 / -1;">
+            <label>Question</label>
+            <input type="text" name="question" class="form-control" placeholder="E.g. Where should we go for the trip?" required>
+        </div>
+        <div class="form-group">
+            <label>Option 1</label>
+            <input type="text" name="options" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label>Option 2</label>
+            <input type="text" name="options" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label>Option 3 (Optional)</label>
+            <input type="text" name="options" class="form-control">
+        </div>
+        <div class="form-group">
+            <label>Option 4 (Optional)</label>
+            <input type="text" name="options" class="form-control">
+        </div>
+        <div class="form-group" style="grid-column:1 / -1;display:flex;justify-content:flex-end;">
+            <button type="submit" class="btn btn-primary">Create Poll</button>
+        </div>
+    </form>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr><th>Question</th><th>Options</th><th>Votes</th><th>Action</th></tr>
+            </thead>
+            <tbody>
+                {% for poll in polls %}
+                <tr>
+                    <td><strong>{{ poll.question }}</strong></td>
+                    <td>{{ poll.options|length }} options</td>
+                    <td>{{ poll.votes|length }}</td>
+                    <td>
+                        <form method="POST" action="{{ url_for('admin.admin_delete_poll', poll_id=poll.id) }}" onsubmit="return confirm('Delete poll?');">
+                            <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td colspan="4" style="text-align:center;color:var(--text-muted);">No polls created.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

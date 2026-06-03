@@ -1,45 +1,23 @@
-from flask import render_template, request, redirect, url_for
+from flask import render_template, request, abort
 from flask_login import login_required, current_user
 from datetime import datetime
-
-from models.student import Student
-from models.notification import Notification
-from models.academic import Class, Exam, Subject
 from models.attendance import Attendance
 from models.marks import Mark
-from database import db
-from . import main
+from models.academic import Subject, Exam
+from models.notification import Notification
+from . import student_bp
+from utils.decorators import student_required
 
-
-@main.route('/dashboard')
+@student_bp.route('/dashboard')
 @login_required
+@student_required
 def dashboard():
-    if current_user.role == 'admin':
-        return redirect(url_for('main.admin_dashboard'))
-
-    if current_user.role == 'teacher':
-        total_students = Student.query.count()
-        total_classes = Class.query.count()
-        pending_notifications = Notification.query.filter(
-            (Notification.recipient_user_id == current_user.id) |
-            (Notification.recipient_user_id == None)  # noqa: E711
-        ).filter_by(is_read=False).count()
-        return render_template(
-            'teacher/dashboard.html',
-            total_students=total_students,
-            total_classes=total_classes,
-            pending_notifications=pending_notifications,
-        )
-
-    # --- Student dashboard ---
     student = current_user.student_profile
     if not student:
-        from flask import abort
         abort(403)
 
     att_percent = student.get_attendance_percentage()
 
-    # Recent attendance (last 10)
     recent_records = (
         Attendance.query
         .filter_by(student_id=student.id)
@@ -48,7 +26,6 @@ def dashboard():
         .all()
     )
 
-    # Optional date-filtered attendance
     start_date = request.args.get('start_date')
     end_date = request.args.get('end_date')
     att_query = Attendance.query.filter_by(student_id=student.id)
@@ -62,7 +39,6 @@ def dashboard():
         )
     records = att_query.order_by(Attendance.date.desc()).all()
 
-    # Notifications (personal + broadcast)
     notifications = (
         Notification.query
         .filter(
@@ -74,7 +50,6 @@ def dashboard():
         .all()
     )
 
-    # Marks summary
     marks = (
         Mark.query
         .filter_by(student_id=student.id)

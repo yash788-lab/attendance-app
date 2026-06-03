@@ -3,10 +3,10 @@ from flask_login import login_required, current_user
 
 from models.notification import Notification
 from database import db
-from . import main
+from . import teacher_bp
 
 
-@main.route('/notifications')
+@teacher_bp.route('/notifications')
 @login_required
 def view_notifications():
     # Fetch personal + broadcast notifications

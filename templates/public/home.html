@@ -35,6 +35,94 @@
     </div>
 </div>
 
+<!-- News & Updates Section -->
+{% if announcements or events or polls %}
+<div class="py-16 md:py-24 bg-gray-50 relative -mt-10 rounded-t-3xl z-10 shadow-xl border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-3xl mx-auto mb-16">
+            <h2 class="text-sm font-bold text-primary-600 tracking-widest uppercase mb-3">Notice Board</h2>
+            <h3 class="text-3xl md:text-4xl font-heading font-bold text-gray-900 mb-4">Latest Updates & Events</h3>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Announcements Column -->
+            <div class="lg:col-span-2">
+                <h4 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">📣 Announcements</h4>
+                <div class="space-y-4">
+                    {% for ann in announcements %}
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border {{ 'border-yellow-400 bg-yellow-50/30' if ann.is_pinned else 'border-gray-100' }}">
+                        <div class="flex justify-between items-start mb-2">
+                            <h5 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                                {{ ann.title }}
+                                {% if ann.is_pinned %}<span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full uppercase tracking-wider font-bold">Pinned</span>{% endif %}
+                            </h5>
+                            <span class="text-sm text-gray-500 whitespace-nowrap">{{ ann.created_at.strftime('%b %d, %Y') }}</span>
+                        </div>
+                        <p class="text-gray-600 whitespace-pre-wrap">{{ ann.content }}</p>
+                    </div>
+                    {% else %}
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center text-gray-500">
+                        No recent announcements.
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Events & Polls Column -->
+            <div class="space-y-8">
+                <!-- Upcoming Events -->
+                <div>
+                    <h4 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">📅 Upcoming Events</h4>
+                    <div class="space-y-4">
+                        {% for ev in events %}
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex gap-4 items-start">
+                            <div class="bg-primary-50 rounded-xl p-3 text-center min-w-[60px]">
+                                <span class="block text-primary-600 font-bold text-lg leading-none">{{ ev.event_date.strftime('%d') }}</span>
+                                <span class="block text-primary-500 text-xs font-bold uppercase mt-1">{{ ev.event_date.strftime('%b') }}</span>
+                            </div>
+                            <div>
+                                <h5 class="font-bold text-gray-900">{{ ev.title }}</h5>
+                                <p class="text-sm text-gray-500 mt-1 flex items-center gap-1">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                    {{ ev.location or 'TBA' }}
+                                </p>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center text-gray-500">
+                            No upcoming events.
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Polls -->
+                {% if polls %}
+                <div>
+                    <h4 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">📊 Community Polls</h4>
+                    <div class="space-y-4">
+                        {% for poll in polls %}
+                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                            <h5 class="font-bold text-gray-900 mb-4">{{ poll.question }}</h5>
+                            <div class="space-y-2">
+                                {% for opt in poll.options %}
+                                <div class="w-full text-left px-4 py-2 rounded-xl bg-gray-50 border border-gray-200 text-sm font-medium text-gray-700">
+                                    {{ opt.option_text }}
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <p class="text-xs text-gray-400 mt-4 text-center">Log in to vote</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 <!-- Quick Highlights Section -->
 <div class="py-16 md:py-24 bg-white relative -mt-10 rounded-t-3xl z-10 shadow-xl">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

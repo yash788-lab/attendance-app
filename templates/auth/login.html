@@ -81,7 +81,7 @@
                 {% endif %}
             {% endwith %}
 
-            <form method="POST" action="{{ url_for('main.login') }}" class="space-y-5">
+            <form method="POST" action="{{ url_for('auth.login') }}" class="space-y-5">
                 <div>
                     <label for="email" class="block text-sm font-medium text-gray-700 mb-1.5">Email Address</label>
                     <div class="relative">
@@ -110,15 +110,15 @@
 
             <div class="mt-8 pt-6 border-t border-gray-200">
                 <p class="text-center text-sm text-gray-500 mb-4">Are you a new teacher?</p>
-                <a href="{{ url_for('main.teacher_register') }}" class="w-full flex justify-center py-3 px-4 border border-gray-300 rounded-xl shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition duration-200">
+                <a href="{{ url_for('auth.teacher_register') }}" class="w-full flex justify-center py-3 px-4 border border-gray-300 rounded-xl shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition duration-200">
                     Register for an Account
                 </a>
             </div>
 
             <div class="mt-10 flex justify-center gap-4 text-sm font-medium">
-                <a href="{{ url_for('main.student_login') }}" class="text-gray-500 hover:text-primary-600 transition-colors">Student Login</a>
+                <a href="{{ url_for('auth.student_login') }}" class="text-gray-500 hover:text-primary-600 transition-colors">Student Login</a>
                 <span class="text-gray-300">|</span>
-                <a href="{{ url_for('main.admin_login') }}" class="text-gray-500 hover:text-primary-600 transition-colors">Admin Login</a>
+                <a href="{{ url_for('auth.admin_login') }}" class="text-gray-500 hover:text-primary-600 transition-colors">Admin Login</a>
             </div>
             <div class="mt-6 text-center">
                 <a href="{{ url_for('public.home') }}" class="text-sm text-primary-600 hover:text-primary-700 hover:underline">← Back to Website</a>

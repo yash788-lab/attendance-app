@@ -30,20 +30,63 @@
             }
         }
     </script>
-    <style type="text/tailwindcss">
-        @layer utilities {
-            .heading-text {
-                @apply font-heading font-bold text-gray-900 tracking-tight;
-            }
-            .nav-link {
-                @apply text-sm font-medium text-gray-600 hover:text-primary-600 transition-colors duration-200;
-            }
-            .btn-primary {
-                @apply inline-flex items-center justify-center px-6 py-3 border border-transparent rounded-lg shadow-sm text-base font-medium text-white bg-primary-600 hover:bg-primary-700 transition duration-200;
-            }
-            .btn-secondary {
-                @apply inline-flex items-center justify-center px-6 py-3 border border-gray-300 rounded-lg shadow-sm text-base font-medium text-gray-700 bg-white hover:bg-gray-50 transition duration-200;
-            }
+    <style>
+        .heading-text {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            color: #111827;
+            letter-spacing: -0.025em;
+        }
+        .nav-link {
+            font-size: 0.875rem;
+            line-height: 1.25rem;
+            font-weight: 500;
+            color: #4b5563;
+            transition: color 0.2s;
+            text-decoration: none;
+        }
+        .nav-link:hover {
+            color: #4f46e5;
+        }
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            border: 1px solid transparent;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
+            font-size: 1rem;
+            line-height: 1.5rem;
+            font-weight: 500;
+            color: #ffffff;
+            background-color: #4f46e5;
+            transition: background-color 0.2s;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .btn-primary:hover {
+            background-color: #4338ca;
+        }
+        .btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);
+            font-size: 1rem;
+            line-height: 1.5rem;
+            font-weight: 500;
+            color: #374151;
+            background-color: #ffffff;
+            transition: background-color 0.2s;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .btn-secondary:hover {
+            background-color: #f9fafb;
         }
     </style>
     <title>{% block title %}School Excellence{% endblock %}</title>

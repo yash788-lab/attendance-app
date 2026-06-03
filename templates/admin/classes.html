@@ -9,7 +9,7 @@
         {% if classes %}
         <div class="table-wrap">
             <table>
-                <thead><tr><th>#</th><th>Class Name</th><th>Academic Year</th><th>Students</th></tr></thead>
+                <thead><tr><th>#</th><th>Class Name</th><th>Academic Year</th><th>Students</th><th>Actions</th></tr></thead>
                 <tbody>
                     {% for c in classes %}
                     <tr>
@@ -17,6 +17,11 @@
                         <td><strong>Class {{ c.name }}</strong></td>
                         <td>{{ c.academic_year }}</td>
                         <td>{{ c.students|length }}</td>
+                        <td>
+                            <form method="POST" action="{{ url_for('admin.admin_delete_class', class_id=c.id) }}" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete Class {{ c.name }}?')">
+                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                            </form>
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -28,7 +33,7 @@
     </div>
     <div class="card">
         <div class="card-header"><h3 class="card-title">Add New Class</h3></div>
-        <form method="POST" action="{{ url_for('main.admin_add_class') }}">
+        <form method="POST" action="{{ url_for('admin.admin_add_class') }}">
             <div class="form-group">
                 <label>Class Name</label>
                 <input type="text" name="name" class="form-control" placeholder="e.g. 10-A or 12-Science" required>

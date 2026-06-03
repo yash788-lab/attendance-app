@@ -40,9 +40,9 @@
             <div class="col-span-1">
                 <h3 class="text-sm font-semibold text-white tracking-wider uppercase mb-4">Portals</h3>
                 <ul class="space-y-3">
-                    <li><a href="{{ url_for('main.student_login') }}" class="text-sm hover:text-white transition-colors flex items-center gap-2"><span class="text-xs">🎓</span> Student Portal</a></li>
-                    <li><a href="{{ url_for('main.login') }}" class="text-sm hover:text-white transition-colors flex items-center gap-2"><span class="text-xs">👨‍🏫</span> Teacher Portal</a></li>
-                    <li><a href="{{ url_for('main.admin_login') }}" class="text-sm hover:text-white transition-colors flex items-center gap-2"><span class="text-xs">🛡️</span> Admin Portal</a></li>
+                    <li><a href="{{ url_for('auth.student_login') }}" class="text-sm hover:text-white transition-colors flex items-center gap-2"><span class="text-xs">🎓</span> Student Portal</a></li>
+                    <li><a href="{{ url_for('auth.login') }}" class="text-sm hover:text-white transition-colors flex items-center gap-2"><span class="text-xs">👨‍🏫</span> Teacher Portal</a></li>
+                    <li><a href="{{ url_for('auth.admin_login') }}" class="text-sm hover:text-white transition-colors flex items-center gap-2"><span class="text-xs">🛡️</span> Admin Portal</a></li>
                     <li><a href="{{ url_for('public.contact') }}" class="text-sm hover:text-white transition-colors mt-2 block pt-2 border-t border-gray-800">Contact Support</a></li>
                 </ul>
             </div>

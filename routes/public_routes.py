@@ -1,10 +1,19 @@
 from flask import Blueprint, render_template
+from services.communication_service import CommunicationService
+from models.communication import Poll
 
 public_bp = Blueprint('public', __name__)
 
 @public_bp.route('/')
 def home():
-    return render_template('public/home.html')
+    announcements = CommunicationService.get_public_announcements(limit=5)
+    events = CommunicationService.get_upcoming_events(limit=4)
+    polls = Poll.query.filter_by(is_active=True).order_by(Poll.created_at.desc()).limit(2).all()
+    
+    return render_template('public/home.html', 
+                           announcements=announcements, 
+                           events=events,
+                           polls=polls)
 
 @public_bp.route('/about')
 def about():

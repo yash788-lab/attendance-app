@@ -4,12 +4,13 @@ from flask_login import login_required, current_user
 from models.academic import Class, Subject, Exam
 from models.student import Student
 from models.marks import Mark
+from services.notification_service import NotificationService
 from database import db
-from . import main
+from . import teacher_bp
 from utils.decorators import admin_or_teacher_required
 
 
-@main.route('/marks/manage', methods=['GET', 'POST'])
+@teacher_bp.route('/marks/manage', methods=['GET', 'POST'])
 @login_required
 @admin_or_teacher_required
 def manage_marks():
@@ -24,6 +25,7 @@ def manage_marks():
     students_list = []
     existing_marks = {}
     existing_max_marks = {}
+    existing_remarks = {}
 
     if class_id and subject_id and exam_id:
         students_list = (
@@ -39,6 +41,7 @@ def manage_marks():
             if m:
                 existing_marks[s.id] = m.marks_obtained
                 existing_max_marks[s.id] = m.max_marks
+                existing_remarks[s.id] = m.remarks
 
     if request.method == 'POST':
         cls_id = request.form.get('class_id', type=int)
@@ -59,6 +62,8 @@ def manage_marks():
         for s in students:
             score = request.form.get(f'marks_{s.id}')
             max_score = request.form.get(f'max_marks_{s.id}', 100.0, type=float)
+            remarks = request.form.get(f'remarks_{s.id}', '').strip()
+            
             if score:
                 mark = Mark.query.filter_by(
                     student_id=s.id, subject_id=sub_id, exam_id=ex_id
@@ -66,6 +71,7 @@ def manage_marks():
                 if mark:
                     mark.marks_obtained = float(score)
                     mark.max_marks = float(max_score)
+                    mark.remarks = remarks
                     if teacher_id:
                         mark.entered_by = teacher_id
                 else:
@@ -75,10 +81,21 @@ def manage_marks():
                         exam_id=ex_id,
                         marks_obtained=float(score),
                         max_marks=float(max_score),
+                        remarks=remarks,
                         entered_by=teacher_id,
                     ))
 
         db.session.commit()
+        
+        # Trigger notification
+        exam = Exam.query.get(ex_id)
+        subject = Subject.query.get(sub_id)
+        NotificationService.notify_marks_published(
+            class_id=cls_id,
+            exam_name=exam.name if exam else 'an exam',
+            subject_name=subject.name if subject else 'a subject'
+        )
+        
         flash('Marks updated successfully!', 'success')
 
     return render_template(
@@ -92,10 +109,11 @@ def manage_marks():
         students_list=students_list,
         existing_marks=existing_marks,
         existing_max_marks=existing_max_marks,
+        existing_remarks=existing_remarks,
     )
 
 
-@main.route('/marks/student')
+@teacher_bp.route('/marks/student')
 @login_required
 def student_marks():
     student = current_user.student_profile

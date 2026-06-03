@@ -1,10 +1,11 @@
 from flask import render_template, request, redirect, url_for, flash
 from flask_login import login_user, logout_user, login_required, current_user
 
-from models.user import User, Admin
+from models.user import User
+from models.admin import Admin
 from models.teacher import Teacher
 from database import db
-from . import main
+from . import auth_bp
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -23,10 +24,15 @@ def _authenticate(email, password):
 # ─────────────────────────────────────────────────────────────────────────────
 # ADMIN LOGIN  (/admin/login)
 # ─────────────────────────────────────────────────────────────────────────────
-@main.route('/admin/login', methods=['GET', 'POST'])
+@auth_bp.route('/admin/login', methods=['GET', 'POST'])
 def admin_login():
     if current_user.is_authenticated:
-        return redirect(url_for('main.dashboard'))
+        if current_user.role == 'admin':
+            return redirect(url_for('admin.admin_dashboard'))
+        elif current_user.role == 'student':
+            return redirect(url_for('student.dashboard'))
+        else:
+            return redirect(url_for('teacher.dashboard'))
 
     if request.method == 'POST':
         email    = request.form.get('email', '')
@@ -42,7 +48,7 @@ def admin_login():
             return render_template('auth/admin_login.html')
 
         login_user(user, remember=False)
-        return redirect(url_for('main.admin_dashboard'))
+        return redirect(url_for('admin.admin_dashboard'))
 
     return render_template('auth/admin_login.html')
 
@@ -50,10 +56,15 @@ def admin_login():
 # ─────────────────────────────────────────────────────────────────────────────
 # STUDENT LOGIN  (/student/login)
 # ─────────────────────────────────────────────────────────────────────────────
-@main.route('/student/login', methods=['GET', 'POST'])
+@auth_bp.route('/student/login', methods=['GET', 'POST'])
 def student_login():
     if current_user.is_authenticated:
-        return redirect(url_for('main.dashboard'))
+        if current_user.role == 'admin':
+            return redirect(url_for('admin.admin_dashboard'))
+        elif current_user.role == 'student':
+            return redirect(url_for('student.dashboard'))
+        else:
+            return redirect(url_for('teacher.dashboard'))
 
     if request.method == 'POST':
         email    = request.form.get('email', '')
@@ -72,9 +83,9 @@ def student_login():
 
         if user.must_change_password:
             flash('Please set a new password before continuing.', 'info')
-            return redirect(url_for('main.change_password'))
+            return redirect(url_for('auth.change_password'))
 
-        return redirect(url_for('main.dashboard'))
+        return redirect(url_for('student.dashboard'))
 
     return render_template('auth/student_login.html')
 
@@ -82,10 +93,15 @@ def student_login():
 # ─────────────────────────────────────────────────────────────────────────────
 # UNIFIED LOGIN — teachers + fallback  (/login)
 # ─────────────────────────────────────────────────────────────────────────────
-@main.route('/login', methods=['GET', 'POST'])
+@auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('main.dashboard'))
+        if current_user.role == 'admin':
+            return redirect(url_for('admin.admin_dashboard'))
+        elif current_user.role == 'student':
+            return redirect(url_for('student.dashboard'))
+        else:
+            return redirect(url_for('teacher.dashboard'))
 
     if request.method == 'POST':
         email    = request.form.get('email', '')
@@ -99,10 +115,10 @@ def login():
         # Redirect to dedicated portal if not a teacher
         if user.role == 'admin':
             flash('Please use the Admin Login page.', 'info')
-            return redirect(url_for('main.admin_login'))
+            return redirect(url_for('auth.admin_login'))
         if user.role == 'student':
             flash('Please use the Student Login page.', 'info')
-            return redirect(url_for('main.student_login'))
+            return redirect(url_for('auth.student_login'))
 
         # Teacher: must be approved
         if not user.teacher_profile or not user.teacher_profile.is_approved:
@@ -113,9 +129,9 @@ def login():
 
         if user.must_change_password:
             flash('Please set a new password before continuing.', 'info')
-            return redirect(url_for('main.change_password'))
+            return redirect(url_for('auth.change_password'))
 
-        return redirect(url_for('main.dashboard'))
+        return redirect(url_for('teacher.dashboard'))
 
     return render_template('auth/login.html')
 
@@ -123,10 +139,15 @@ def login():
 # ─────────────────────────────────────────────────────────────────────────────
 # TEACHER SELF-REGISTRATION
 # ─────────────────────────────────────────────────────────────────────────────
-@main.route('/teacher/register', methods=['GET', 'POST'])
+@auth_bp.route('/teacher/register', methods=['GET', 'POST'])
 def teacher_register():
     if current_user.is_authenticated:
-        return redirect(url_for('main.dashboard'))
+        if current_user.role == 'admin':
+            return redirect(url_for('admin.admin_dashboard'))
+        elif current_user.role == 'student':
+            return redirect(url_for('student.dashboard'))
+        else:
+            return redirect(url_for('teacher.dashboard'))
 
     if request.method == 'POST':
         name = request.form.get('name', '').strip()
@@ -165,7 +186,7 @@ def teacher_register():
         db.session.commit()
 
         flash('Registration submitted! You will be able to log in once approved by the admin.', 'success')
-        return redirect(url_for('main.login'))
+        return redirect(url_for('auth.login'))
 
     return render_template('auth/teacher_register.html')
 
@@ -173,7 +194,7 @@ def teacher_register():
 # ─────────────────────────────────────────────────────────────────────────────
 # CHANGE PASSWORD (first-login students / any user)
 # ─────────────────────────────────────────────────────────────────────────────
-@main.route('/change-password', methods=['GET', 'POST'])
+@auth_bp.route('/change-password', methods=['GET', 'POST'])
 @login_required
 def change_password():
     if request.method == 'POST':
@@ -197,7 +218,12 @@ def change_password():
         current_user.must_change_password = False
         db.session.commit()
         flash('Password updated successfully!', 'success')
-        return redirect(url_for('main.dashboard'))
+        if current_user.role == 'admin':
+            return redirect(url_for('admin.admin_dashboard'))
+        elif current_user.role == 'student':
+            return redirect(url_for('student.dashboard'))
+        else:
+            return redirect(url_for('teacher.dashboard'))
 
     return render_template('auth/change_password.html')
 
@@ -205,17 +231,17 @@ def change_password():
 # ─────────────────────────────────────────────────────────────────────────────
 # LOGOUT
 # ─────────────────────────────────────────────────────────────────────────────
-@main.route('/logout')
+@auth_bp.route('/logout')
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('main.login'))
+    return redirect(url_for('auth.login'))
 
 
 # ─────────────────────────────────────────────────────────────────────────────
 # RENDER SETUP ROUTE (ONE-TIME USE — run after first deploy)
 # ─────────────────────────────────────────────────────────────────────────────
-@main.route('/setup-render-db')
+@auth_bp.route('/setup-render-db')
 def setup_render_db():
     """
     One-time setup route for Render deployments without shell access.
@@ -301,7 +327,8 @@ def setup_render_db():
 
     # ── 6. Seed Admin account ─────────────────────────────────────────────────
     def seed_admin():
-        from models.user import User, Admin
+        from models.user import User
+        from models.admin import Admin
         if not User.query.filter_by(email='admin@school.edu').first():
             user = User(email='admin@school.edu', role='admin', is_active=True)
             user.set_password('admin123')

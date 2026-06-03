@@ -38,7 +38,7 @@
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">📋 Recent Attendance</h3>
-            <a href="{{ url_for('main.view_attendance') }}" class="btn btn-outline btn-sm">View All</a>
+            <a href="{{ url_for('teacher.student_attendance') }}" class="btn btn-outline btn-sm">View All</a>
         </div>
         {% if recent_records %}
         <div class="table-wrap">
@@ -71,7 +71,7 @@
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">🎯 Recent Marks</h3>
-            <a href="{{ url_for('main.student_marks') }}" class="btn btn-outline btn-sm">View All</a>
+            <a href="{{ url_for('teacher.student_marks') }}" class="btn btn-outline btn-sm">View All</a>
         </div>
         {% if marks %}
         <div class="table-wrap">
@@ -100,7 +100,7 @@
 <div class="card" style="margin-top:20px;">
     <div class="card-header">
         <h3 class="card-title">🔔 Recent Notifications</h3>
-        <a href="{{ url_for('main.view_notifications') }}" class="btn btn-outline btn-sm">View All</a>
+        <a href="{{ url_for('teacher.view_notifications') }}" class="btn btn-outline btn-sm">View All</a>
     </div>
     {% for n in notifications %}
     <div style="padding:14px 0;border-bottom:1px solid var(--border);display:flex;gap:14px;align-items:flex-start;">

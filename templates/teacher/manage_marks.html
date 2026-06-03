@@ -50,7 +50,7 @@
         <div class="table-wrap">
             <table>
                 <thead>
-                    <tr><th>Roll</th><th>Name</th><th>Marks Obtained</th><th>Max Marks</th></tr>
+                    <tr><th>Roll</th><th>Name</th><th>Marks Obtained</th><th>Max Marks</th><th>Remarks</th></tr>
                 </thead>
                 <tbody>
                     {% for s in students_list %}
@@ -68,6 +68,12 @@
                                    style="width:110px;"
                                    value="{{ existing_max_marks.get(s.id, 100) }}"
                                    min="1">
+                        </td>
+                        <td>
+                            <input type="text" name="remarks_{{ s.id }}" class="form-control"
+                                   style="width:200px;"
+                                   value="{{ existing_remarks.get(s.id, '') }}"
+                                   placeholder="Teacher remarks (optional)">
                         </td>
                     </tr>
                     {% endfor %}

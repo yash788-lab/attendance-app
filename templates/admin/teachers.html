@@ -23,10 +23,10 @@
                     <td>{{ t.phone or '—' }}</td>
                     <td>{{ t.created_at.strftime('%d %b %Y') }}</td>
                     <td style="display:flex;gap:8px;">
-                        <form method="POST" action="{{ url_for('main.approve_teacher', teacher_id=t.id) }}">
+                        <form method="POST" action="{{ url_for('admin.approve_teacher', teacher_id=t.id) }}">
                             <button class="btn btn-success btn-sm">✓ Approve</button>
                         </form>
-                        <form method="POST" action="{{ url_for('main.reject_teacher', teacher_id=t.id) }}" onsubmit="return confirm('Permanently reject this registration?')">
+                        <form method="POST" action="{{ url_for('admin.reject_teacher', teacher_id=t.id) }}" onsubmit="return confirm('Permanently reject this registration?')">
                             <button class="btn btn-danger btn-sm">✕ Reject</button>
                         </form>
                     </td>
@@ -45,7 +45,7 @@
     {% if approved %}
     <div class="table-wrap">
         <table>
-            <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Joined</th><th>Status</th></tr></thead>
+            <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Joined</th><th>Status</th><th>Actions</th></tr></thead>
             <tbody>
                 {% for t in approved %}
                 <tr>
@@ -54,6 +54,11 @@
                     <td>{{ t.phone or '—' }}</td>
                     <td>{{ t.created_at.strftime('%d %b %Y') }}</td>
                     <td><span class="badge badge-green">Active</span></td>
+                    <td>
+                        <form method="POST" action="{{ url_for('admin.admin_delete_teacher', teacher_id=t.id) }}" style="display:inline;" onsubmit="return confirm('Are you sure you want to permanently remove teacher {{ t.name }}? This will also remove any homework they set.')">
+                            <button type="submit" class="btn btn-danger btn-sm">Remove</button>
+                        </form>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>

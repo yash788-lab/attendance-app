@@ -22,71 +22,148 @@
             }
         }
     </script>
-    <style type="text/tailwindcss">
-        @layer components {
-            .page-header { @apply mb-8; }
-            .page-header h2 { @apply text-2xl font-bold text-gray-900 dark:text-white mb-1; }
-            .page-header p { @apply text-sm text-gray-500 dark:text-gray-400; }
+    <style>
+            .page-header { margin-bottom: 2rem; }
+            .page-header h2 { font-size: 1.5rem; line-height: 2rem; font-weight: 700; color: #111827; margin-bottom: 0.25rem; }
+            .dark .page-header h2 { color: #ffffff; }
+            .page-header p { font-size: 0.875rem; line-height: 1.25rem; color: #6b7280; }
+            .dark .page-header p { color: #9ca3af; }
             
-            .stats-grid { @apply grid grid-cols-1 md:grid-cols-3 gap-6 mb-8; }
-            .stat-card { @apply bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 flex items-center gap-4 transition-all hover:shadow-md; }
-            .stat-icon { @apply w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0; }
-            .stat-icon.green { @apply bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400; }
-            .stat-icon.cyan { @apply bg-cyan-100 text-cyan-600 dark:bg-cyan-900/30 dark:text-cyan-400; }
-            .stat-icon.amber { @apply bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400; }
-            .stat-icon.purple { @apply bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400; }
-            .stat-icon.blue { @apply bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400; }
-            .stat-icon.red { @apply bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400; }
-            .stat-value { @apply text-2xl font-bold text-gray-900 dark:text-white; }
-            .stat-label { @apply text-sm text-gray-500 dark:text-gray-400 font-medium; }
+            .stats-grid { display: grid; grid-template-columns: repeat(1, minmax(0, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem; }
+            @media (min-width: 768px) {
+                .stats-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+            }
             
-            .card { @apply bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden mb-6; }
-            .card-header { @apply px-6 py-4 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/50; }
-            .card-title { @apply text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2; }
-            .card-body { @apply p-6; }
+            .stat-card { background-color: #ffffff; padding: 1.5rem; border-radius: 1rem; box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1); border: 1px solid #f3f4f6; display: flex; align-items: center; gap: 1rem; transition: all 0.2s; }
+            .dark .stat-card { background-color: #1f2937; border-color: #374151; }
+            .stat-card:hover { box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1); }
             
-            .btn { @apply inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-gray-900; }
-            .btn-primary { @apply bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500 border border-transparent shadow-sm; }
-            .btn-secondary { @apply bg-white text-gray-700 hover:bg-gray-50 border border-gray-300 shadow-sm dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-700; }
-            .btn-danger { @apply bg-red-600 text-white hover:bg-red-700 focus:ring-red-500 border border-transparent shadow-sm; }
-            .btn-outline { @apply bg-transparent text-primary-600 border border-primary-200 hover:bg-primary-50 dark:text-primary-400 dark:border-primary-800 dark:hover:bg-primary-900/30; }
-            .btn-sm { @apply px-3 py-1.5 text-xs rounded-md; }
+            .stat-icon { width: 3rem; height: 3rem; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0; }
+            .stat-icon.green { background-color: #d1fae5; color: #059669; }
+            .dark .stat-icon.green { background-color: rgba(16, 185, 129, 0.3); color: #34d399; }
             
-            .table-wrap { @apply w-full overflow-x-auto; }
-            table { @apply w-full text-left border-collapse whitespace-nowrap; }
-            th { @apply px-6 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider bg-gray-50 dark:bg-gray-800/50 border-b border-gray-200 dark:border-gray-700; }
-            td { @apply px-6 py-4 text-sm text-gray-700 dark:text-gray-300 border-b border-gray-100 dark:border-gray-700/50; }
-            tr:hover td { @apply bg-gray-50/50 dark:bg-gray-800/30; }
-            tr:last-child td { @apply border-0; }
+            .stat-icon.cyan { background-color: #ecfeff; color: #0891b2; }
+            .dark .stat-icon.cyan { background-color: rgba(6, 182, 212, 0.3); color: #22d3ee; }
             
-            .badge { @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border; }
-            .badge-green { @apply bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800/50; }
-            .badge-red { @apply bg-red-50 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800/50; }
-            .badge-yellow { @apply bg-yellow-50 text-yellow-800 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-400 dark:border-yellow-800/50; }
-            .badge-amber { @apply bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800/50; }
-            .badge-blue { @apply bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800/50; }
-            .badge-purple { @apply bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/20 dark:text-purple-400 dark:border-purple-800/50; }
-            .badge-admin { @apply bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-900/20 dark:text-purple-400; }
-            .badge-teacher { @apply bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400; }
-            .badge-student { @apply bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400; }
+            .stat-icon.amber { background-color: #fef3c7; color: #d97706; }
+            .dark .stat-icon.amber { background-color: rgba(245, 158, 11, 0.3); color: #fbbf24; }
             
-            .form-grid { @apply grid grid-cols-1 md:grid-cols-2 gap-6; }
-            .form-group { @apply mb-4; }
-            .form-group label { @apply block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5; }
-            .form-control, input[type="text"], input[type="email"], input[type="password"], input[type="date"], select, textarea { @apply w-full rounded-xl border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-4 py-2.5 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all; }
+            .stat-icon.purple { background-color: #f3e8ff; color: #7c3aed; }
+            .dark .stat-icon.purple { background-color: rgba(139, 92, 246, 0.3); color: #c084fc; }
             
-            /* Notification styles */
-            .notification-item { @apply p-4 border-b border-gray-100 dark:border-gray-700/50 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors; }
-            .notification-item.unread { @apply bg-primary-50/50 dark:bg-primary-900/10 border-l-4 border-l-primary-500; }
+            .stat-icon.blue { background-color: #dbeafe; color: #2563eb; }
+            .dark .stat-icon.blue { background-color: rgba(59, 130, 246, 0.3); color: #60a5fa; }
             
-            /* Action bar */
-            .action-bar { @apply flex flex-col sm:flex-row justify-between items-center gap-4 mb-6 bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700; }
+            .stat-icon.red { background-color: #fee2e2; color: #dc2626; }
+            .dark .stat-icon.red { background-color: rgba(239, 68, 68, 0.3); color: #f87171; }
             
-            /* Pagination */
-            .pagination { @apply flex items-center justify-center gap-2 mt-6; }
-            .pagination .page-item { @apply w-8 h-8 flex items-center justify-center rounded-lg text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700; }
-            .pagination .page-item.active { @apply bg-primary-600 text-white hover:bg-primary-700; }
-        }
+            .stat-value { font-size: 1.5rem; line-height: 2rem; font-weight: 700; color: #111827; }
+            .dark .stat-value { color: #ffffff; }
+            .stat-label { font-size: 0.875rem; line-height: 1.25rem; color: #6b7280; font-weight: 500; }
+            .dark .stat-label { color: #9ca3af; }
+            
+            .card { background-color: #ffffff; border-radius: 1rem; box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1); border: 1px solid #f3f4f6; overflow: hidden; margin-bottom: 1.5rem; }
+            .dark .card { background-color: #1f2937; border-color: #374151; }
+            
+            .card-header { padding: 1rem 1.5rem; border-bottom: 1px solid #f3f4f6; display: flex; justify-content: space-between; align-items: center; background-color: rgba(249, 250, 251, 0.5); }
+            .dark .card-header { border-color: #374151; background-color: rgba(31, 41, 55, 0.5); }
+            
+            .card-title { font-size: 1.125rem; line-height: 1.75rem; font-weight: 600; color: #111827; display: flex; align-items: center; gap: 0.5rem; }
+            .dark .card-title { color: #ffffff; }
+            
+            .card-body { padding: 1.5rem; }
+            
+            .btn { display: inline-flex; align-items: center; justify-content: center; padding: 0.5rem 1rem; font-size: 0.875rem; line-height: 1.25rem; font-weight: 500; border-radius: 0.5rem; transition: background-color 0.15s, border-color 0.15s, color 0.15s; outline: none; border: 1px solid transparent; cursor: pointer; text-decoration: none; }
+            .btn:focus { outline: 2px solid transparent; outline-offset: 2px; }
+            
+            .btn-primary { background-color: #4f46e5; color: #ffffff; border-color: transparent; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05); }
+            .btn-primary:hover { background-color: #4338ca; }
+            
+            .btn-secondary { background-color: #ffffff; color: #374151; border-color: #d1d5db; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05); }
+            .btn-secondary:hover { background-color: #f9fafb; }
+            .dark .btn-secondary { background-color: #1f2937; color: #e5e7eb; border-color: #4b5563; }
+            .dark .btn-secondary:hover { background-color: #374151; }
+            
+            .btn-danger { background-color: #dc2626; color: #ffffff; border-color: transparent; box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05); }
+            .btn-danger:hover { background-color: #b91c1c; }
+            
+            .btn-outline { background-color: transparent; color: #6366f1; border: 1px solid #e0e7ff; }
+            .btn-outline:hover { background-color: #eef2ff; }
+            .dark .btn-outline { color: #818cf8; border-color: #3730a3; }
+            .dark .btn-outline:hover { background-color: rgba(67, 56, 202, 0.3); }
+            
+            .btn-sm { padding: 0.375rem 0.75rem; font-size: 0.75rem; line-height: 1rem; border-radius: 0.375rem; }
+            
+            .table-wrap { width: 100%; overflow-x: auto; }
+            table { width: 100%; text-align: left; border-collapse: collapse; white-space: nowrap; }
+            th { padding: 0.75rem 1.5rem; font-size: 0.75rem; line-height: 1rem; font-weight: 600; color: #6b7280; text-transform: uppercase; tracking: 0.05em; background-color: #f9fafb; border-bottom: 1px solid #e5e7eb; }
+            .dark th { color: #9ca3af; background-color: rgba(31, 41, 55, 0.5); border-color: #374151; }
+            td { padding: 1rem 1.5rem; font-size: 0.875rem; line-height: 1.25rem; color: #374151; border-bottom: 1px solid #f3f4f6; }
+            .dark td { color: #d1d5db; border-color: rgba(55, 65, 81, 0.5); }
+            tr:hover td { background-color: rgba(249, 250, 251, 0.5); }
+            .dark tr:hover td { background-color: rgba(31, 41, 55, 0.3); }
+            tr:last-child td { border: 0; }
+            
+            .badge { display: inline-flex; align-items: center; padding: 0.125rem 0.625rem; border-radius: 9999px; font-size: 0.75rem; line-height: 1rem; font-weight: 500; border: 1px solid transparent; }
+            .badge-green { background-color: #f0fdf4; color: #166534; border-color: #bbf7d0; }
+            .dark .badge-green { background-color: rgba(16, 185, 129, 0.2); color: #34d399; border-color: rgba(6, 78, 59, 0.5); }
+            
+            .badge-red { background-color: #fef2f2; color: #991b1b; border-color: #fecaca; }
+            .dark .badge-red { background-color: rgba(239, 68, 68, 0.2); color: #f87171; border-color: rgba(127, 29, 29, 0.5); }
+            
+            .badge-yellow { background-color: #fef9c3; color: #854d0e; border-color: #fef08a; }
+            .dark .badge-yellow { background-color: rgba(234, 179, 8, 0.2); color: #facc15; border-color: rgba(113, 63, 18, 0.5); }
+            
+            .badge-amber { background-color: #fffbeb; color: #92400e; border-color: #fde68a; }
+            .dark .badge-amber { background-color: rgba(245, 158, 11, 0.2); color: #fbbf24; border-color: rgba(120, 53, 4, 0.5); }
+            
+            .badge-blue { background-color: #eff6ff; color: #1e40af; border-color: #bfdbfe; }
+            .dark .badge-blue { background-color: rgba(59, 130, 246, 0.2); color: #60a5fa; border-color: rgba(30, 58, 138, 0.5); }
+            
+            .badge-purple { background-color: #faf5ff; color: #6b21a8; border-color: #e9d5ff; }
+            .dark .badge-purple { background-color: rgba(139, 92, 246, 0.2); color: #c084fc; border-color: rgba(88, 28, 135, 0.5); }
+            
+            .badge-admin { background-color: #faf5ff; color: #6b21a8; border-color: #e9d5ff; }
+            .dark .badge-admin { background-color: rgba(139, 92, 246, 0.2); color: #c084fc; }
+            
+            .badge-teacher { background-color: #eff6ff; color: #1e40af; border-color: #bfdbfe; }
+            .dark .badge-teacher { background-color: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+            
+            .badge-student { background-color: #f0fdf4; color: #166534; border-color: #bbf7d0; }
+            .dark .badge-student { background-color: rgba(16, 185, 129, 0.2); color: #34d399; }
+            
+            .form-grid { display: grid; grid-template-columns: repeat(1, minmax(0, 1fr)); gap: 1.5rem; }
+            @media (min-width: 768px) {
+                .form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            }
+            .form-group { margin-bottom: 1rem; }
+            .form-group label { display: block; font-size: 0.875rem; line-height: 1.25rem; font-weight: 500; color: #374151; margin-bottom: 0.375rem; }
+            .dark .form-group label { color: #d1d5db; }
+            
+            .form-control, input[type="text"], input[type="email"], input[type="password"], input[type="date"], select, textarea { width: 100%; border-radius: 0.75rem; border: 1px solid #d1d5db; background-color: #ffffff; padding: 0.625rem 1rem; font-size: 0.875rem; line-height: 1.25rem; color: #111827; outline: none; transition: all 0.2s; }
+            .form-control:focus, input[type="text"]:focus, input[type="email"]:focus, input[type="password"]:focus, input[type="date"]:focus, select:focus, textarea:focus { border-color: #6366f1; box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2); }
+            .dark .form-control, .dark input[type="text"], .dark input[type="email"], .dark input[type="password"], .dark input[type="date"], .dark select, .dark textarea { border-color: #4b5563; background-color: #1f2937; color: #ffffff; }
+            
+            .notification-item { padding: 1rem; border-bottom: 1px solid #f3f4f6; transition: background-color 0.15s; }
+            .notification-item:hover { background-color: #f9fafb; }
+            .dark .notification-item { border-color: rgba(55, 65, 81, 0.5); }
+            .dark .notification-item:hover { background-color: rgba(31, 41, 55, 0.5); }
+            .notification-item.unread { background-color: rgba(238, 242, 255, 0.5); border-left: 4px solid #6366f1; }
+            .dark .notification-item.unread { background-color: rgba(99, 102, 241, 0.1); }
+            
+            .action-bar { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem; background-color: #ffffff; padding: 1rem; border-radius: 1rem; box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px -1px rgba(0,0,0,0.1); border: 1px solid #f3f4f6; }
+            @media (min-width: 640px) {
+                .action-bar { flex-direction: row; justify-content: space-between; align-items: center; }
+            }
+            .dark .action-bar { background-color: #1f2937; border-color: #374151; }
+            
+            .pagination { display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-top: 1.5rem; }
+            .pagination .page-item { width: 2rem; height: 2rem; display: flex; align-items: center; justify-content: center; border-radius: 0.5rem; font-size: 0.875rem; line-height: 1.25rem; font-weight: 500; color: #4b5563; cursor: pointer; text-decoration: none; }
+            .pagination .page-item:hover { background-color: #f3f4f6; }
+            .dark .pagination .page-item { color: #9ca3af; }
+            .dark .pagination .page-item:hover { background-color: #374151; }
+            .pagination .page-item.active { background-color: #4f46e5; color: #ffffff; }
+            .pagination .page-item.active:hover { background-color: #4338ca; }
     </style>
     {% block head %}{% endblock %}
 </head>
@@ -133,56 +210,67 @@
         {% endif %}
 
         <!-- Navigation Menu -->
-        <nav class="flex-1 px-4 py-6 space-y-1 overflow-y-auto custom-scrollbar">
-            {% if current_user.is_authenticated %}
+        <nav class="flex-1 px-4 py-6 space-y-1 overflow-y-auto custom-scrollbar">            {% if current_user.is_authenticated %}
                 <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 mt-4 first:mt-0 px-2">Main</div>
-                <a href="{{ url_for('main.dashboard') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-colors {{ 'bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400' if request.endpoint == 'main.dashboard' else 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700/50' }}">
-                    <span class="mr-3 text-lg {{ 'text-primary-600' if request.endpoint == 'main.dashboard' else 'text-gray-400 group-hover:text-gray-600 dark:text-gray-500' }}">🏠</span>
-                    Dashboard
-                </a>
+                {% if current_user.role == 'admin' %}
+                    <a href="{{ url_for('admin.admin_dashboard') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-colors {{ 'bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400' if request.endpoint == 'admin.admin_dashboard' else 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700/50' }}">
+                        <span class="mr-3 text-lg {{ 'text-primary-600' if request.endpoint == 'admin.admin_dashboard' else 'text-gray-400 group-hover:text-gray-600 dark:text-gray-500' }}">🏠</span>
+                        Dashboard
+                    </a>
+                {% elif current_user.role == 'student' %}
+                    <a href="{{ url_for('student.dashboard') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-colors {{ 'bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400' if request.endpoint == 'student.dashboard' else 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700/50' }}">
+                        <span class="mr-3 text-lg {{ 'text-primary-600' if request.endpoint == 'student.dashboard' else 'text-gray-400 group-hover:text-gray-600 dark:text-gray-500' }}">🏠</span>
+                        Dashboard
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('teacher.dashboard') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-colors {{ 'bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400' if request.endpoint == 'teacher.dashboard' else 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700/50' }}">
+                        <span class="mr-3 text-lg {{ 'text-primary-600' if request.endpoint == 'teacher.dashboard' else 'text-gray-400 group-hover:text-gray-600 dark:text-gray-500' }}">🏠</span>
+                        Dashboard
+                    </a>
+                {% endif %}
 
                 {% if current_user.role == 'admin' %}
                     <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 mt-8 px-2">Administration</div>
-                    <a href="{{ url_for('main.admin_students') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-colors {{ 'bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400' if request.endpoint == 'main.admin_students' else 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700/50' }}">
+                    <a href="{{ url_for('admin.admin_students') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-colors {{ 'bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400' if request.endpoint == 'admin.admin_students' else 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700/50' }}">
                         <span class="mr-3 text-lg">👥</span> Students
                     </a>
-                    <a href="{{ url_for('main.admin_teachers') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-colors justify-between {{ 'bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400' if request.endpoint == 'main.admin_teachers' else 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700/50' }}">
+                    <a href="{{ url_for('admin.admin_teachers') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-colors justify-between {{ 'bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400' if request.endpoint == 'admin.admin_teachers' else 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700/50' }}">
                         <div class="flex items-center"><span class="mr-3 text-lg">👨‍🏫</span> Teachers</div>
                         {% if pending_teachers_count %}
                             <span class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-500 rounded-full">{{ pending_teachers_count }}</span>
                         {% endif %}
                     </a>
-                    <a href="{{ url_for('main.admin_classes') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-colors {{ 'bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400' if request.endpoint == 'main.admin_classes' else 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700/50' }}">
+                    <a href="{{ url_for('admin.admin_classes') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-colors {{ 'bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400' if request.endpoint == 'admin.admin_classes' else 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700/50' }}">
                         <span class="mr-3 text-lg">🏛️</span> Classes
                     </a>
-                    <a href="{{ url_for('main.admin_subjects') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-colors {{ 'bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400' if request.endpoint == 'main.admin_subjects' else 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700/50' }}">
+                    <a href="{{ url_for('admin.admin_subjects') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-colors {{ 'bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400' if request.endpoint == 'admin.admin_subjects' else 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700/50' }}">
                         <span class="mr-3 text-lg">📚</span> Subjects
                     </a>
-                    <a href="{{ url_for('main.admin_exams') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-colors {{ 'bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400' if request.endpoint == 'main.admin_exams' else 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700/50' }}">
+                    <a href="{{ url_for('admin.admin_exams') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-colors {{ 'bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400' if request.endpoint == 'admin.admin_exams' else 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700/50' }}">
                         <span class="mr-3 text-lg">📝</span> Exams
                     </a>
 
                 {% elif current_user.role == 'teacher' %}
                     <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 mt-8 px-2">Teaching</div>
-                    <a href="{{ url_for('main.students') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-colors text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700/50">
+                    <a href="{{ url_for('teacher.students') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-colors {{ 'bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400' if request.endpoint == 'teacher.students' else 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700/50' }}">
                         <span class="mr-3 text-lg">👥</span> Students
                     </a>
-                    <a href="{{ url_for('main.mark_attendance') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-colors text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700/50">
+                    <a href="{{ url_for('teacher.mark_attendance') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-colors {{ 'bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400' if request.endpoint in ('teacher.mark_attendance', 'teacher.student_attendance') else 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700/50' }}">
                         <span class="mr-3 text-lg">📅</span> Attendance
                     </a>
-                    <a href="{{ url_for('main.attendance_reports') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-colors text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700/50">
+                    <a href="{{ url_for('teacher.attendance_reports') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-colors {{ 'bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400' if request.endpoint == 'teacher.attendance_reports' else 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700/50' }}">
                         <span class="mr-3 text-lg">📊</span> Reports
                     </a>
-                    <a href="{{ url_for('main.manage_marks') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-colors text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700/50">
+                    <a href="{{ url_for('teacher.manage_marks') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-colors {{ 'bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400' if request.endpoint in ('teacher.manage_marks', 'teacher.student_marks') else 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700/50' }}">
                         <span class="mr-3 text-lg">🎯</span> Marks
                     </a>
 
                 {% elif current_user.role == 'student' %}
                     <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 mt-8 px-2">My Academics</div>
-                    <a href="{{ url_for('main.student_marks') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-colors text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700/50">
+                    <a href="{{ url_for('teacher.student_marks') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-colors {{ 'bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400' if request.endpoint == 'teacher.student_marks' else 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700/50' }}">
                         <span class="mr-3 text-lg">🎯</span> My Marks
                     </a>
-                    <a href="{{ url_for('main.student_attendance') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-colors text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700/50">
+                    <a href="{{ url_for('teacher.student_attendance') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-colors {{ 'bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400' if request.endpoint == 'teacher.student_attendance' else 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700/50' }}">
                         <span class="mr-3 text-lg">📊</span> My Attendance
                     </a>
                 {% endif %}
@@ -190,10 +278,13 @@
                 <div class="border-t border-gray-100 dark:border-gray-700 my-6"></div>
                 
                 <div class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 px-2">Account</div>
-                <a href="{{ url_for('main.view_notifications') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-colors text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700/50">
-                    <span class="mr-3 text-lg">🔔</span> Notifications
+                <a href="{{ url_for('teacher.view_notifications') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-colors justify-between {{ 'bg-primary-50 text-primary-700 dark:bg-primary-900/20 dark:text-primary-400' if request.endpoint == 'teacher.view_notifications' else 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700/50' }}">
+                    <div class="flex items-center"><span class="mr-3 text-lg">🔔</span> Notifications</div>
+                    {% if unread_notifications and unread_notifications > 0 %}
+                        <span class="inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white bg-red-500 rounded-full">{{ unread_notifications }}</span>
+                    {% endif %}
                 </a>
-                <a href="{{ url_for('main.change_password') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-colors text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700/50">
+                <a href="{{ url_for('auth.change_password') }}" class="group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl transition-colors text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700/50">
                     <span class="mr-3 text-lg">🔐</span> Change Password
                 </a>
             {% endif %}
@@ -201,7 +292,7 @@
 
         {% if current_user.is_authenticated %}
         <div class="p-4 border-t border-gray-100 dark:border-gray-700 flex-shrink-0">
-            <a href="{{ url_for('main.logout') }}" class="flex items-center justify-center w-full px-4 py-2.5 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/40 rounded-xl transition-colors">
+            <a href="{{ url_for('auth.logout') }}" class="flex items-center justify-center w-full px-4 py-2.5 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/40 rounded-xl transition-colors">
                 <span class="mr-2">🚪</span> Sign Out
             </a>
         </div>
@@ -257,6 +348,32 @@
             </div>
         </main>
     </div>
+
+    <!-- Pop up Toast Notification -->
+    {% if unread_notifications and unread_notifications > 0 %}
+    <div id="toastNotification" class="fixed bottom-6 right-6 max-w-sm bg-white dark:bg-gray-800 rounded-xl shadow-2xl border-l-4 border-l-primary-500 p-4 transform translate-y-0 opacity-100 transition-all duration-500 z-50 flex items-start gap-3">
+        <div class="text-primary-500 mt-0.5 text-xl">🔔</div>
+        <div class="flex-1">
+            <h4 class="text-sm font-bold text-gray-900 dark:text-white mb-1">New Notifications</h4>
+            <p class="text-sm text-gray-600 dark:text-gray-300">You have {{ unread_notifications }} unread notification(s).</p>
+            <div class="mt-2 flex gap-3">
+                <a href="{{ url_for('teacher.view_notifications') }}" class="text-xs font-semibold text-primary-600 hover:text-primary-700 dark:text-primary-400">View Now</a>
+                <button onclick="document.getElementById('toastNotification').style.display='none'" class="text-xs font-semibold text-gray-500 hover:text-gray-700">Dismiss</button>
+            </div>
+        </div>
+        <button onclick="document.getElementById('toastNotification').style.display='none'" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 flex-shrink-0">&times;</button>
+    </div>
+    <script>
+        // Auto-dismiss toast after 8 seconds
+        setTimeout(() => {
+            const toast = document.getElementById('toastNotification');
+            if(toast) {
+                toast.classList.add('translate-y-4', 'opacity-0');
+                setTimeout(() => toast.style.display = 'none', 500);
+            }
+        }, 8000);
+    </script>
+    {% endif %}
 
     <!-- Scripts -->
     <script>
