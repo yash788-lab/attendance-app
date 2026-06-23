@@ -25,7 +25,12 @@ def create_app():
     # and Alembic can detect the full schema during `flask db migrate`
     import models  # noqa: F401 — side-effect import registers all tables
 
-    # 2. Init Migrations (must come AFTER models are imported so Alembic sees them)
+    # 2. Auto-create tables on Vercel (ephemeral /tmp SQLite)
+    if os.environ.get('VERCEL') == '1':
+        with app.app_context():
+            db.create_all()
+
+    # 3. Init Migrations (must come AFTER models are imported so Alembic sees them)
     migrate.init_app(app, db)
 
     # 3. Login Manager
@@ -57,17 +62,20 @@ def create_app():
     def inject_global_data():
         """Inject variables into all templates"""
         data = {}
-        if current_user.is_authenticated:
-            from models.notification import Notification
-            data['unread_notifications'] = Notification.query.filter(
-                (Notification.recipient_user_id == current_user.id) |
-                (Notification.recipient_user_id == None),
-                Notification.is_read == False
-            ).count()
-            
-            if current_user.role == 'admin':
-                from models.teacher import Teacher
-                data['pending_teachers_count'] = Teacher.query.filter_by(is_approved=False).count()
+        try:
+            if current_user.is_authenticated:
+                from models.notification import Notification
+                data['unread_notifications'] = Notification.query.filter(
+                    (Notification.recipient_user_id == current_user.id) |
+                    (Notification.recipient_user_id == None),
+                    Notification.is_read == False
+                ).count()
+                
+                if current_user.role == 'admin':
+                    from models.teacher import Teacher
+                    data['pending_teachers_count'] = Teacher.query.filter_by(is_approved=False).count()
+        except Exception:
+            pass
         return data
 
     @app.context_processor
@@ -77,8 +85,6 @@ def create_app():
         from models.communication import Announcement, Event
         from datetime import datetime
 
-        config = SiteConfig.get_all_as_dict()
-        
         # Provide defaults so templates never break on missing keys
         defaults = {
             'school_name': 'Our School',
@@ -99,18 +105,25 @@ def create_app():
             'stats_teachers': '120',
             'stats_awards': '45',
             'logo_url': 'https://img.icons8.com/bubbles/100/graduation-cap.png',
+            'active_announcements': [],
+            'upcoming_events': [],
         }
-        defaults.update(config)
         
-        # Inject live data
-        defaults['active_announcements'] = Announcement.query.filter_by(
-            target_role='all'
-        ).order_by(Announcement.is_pinned.desc(), Announcement.created_at.desc()).limit(10).all()
-        
-        today = datetime.utcnow().date()
-        defaults['upcoming_events'] = Event.query.filter(
-            Event.event_date >= today
-        ).order_by(Event.event_date).limit(4).all()
+        try:
+            config = SiteConfig.get_all_as_dict()
+            defaults.update(config)
+            
+            # Inject live data
+            defaults['active_announcements'] = Announcement.query.filter_by(
+                target_role='all'
+            ).order_by(Announcement.is_pinned.desc(), Announcement.created_at.desc()).limit(10).all()
+            
+            today = datetime.utcnow().date()
+            defaults['upcoming_events'] = Event.query.filter(
+                Event.event_date >= today
+            ).order_by(Event.event_date).limit(4).all()
+        except Exception:
+            pass  # Tables may not exist yet on fresh Vercel deploy
         
         return dict(site_config=defaults)
 

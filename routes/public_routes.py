@@ -4,10 +4,12 @@ public_bp = Blueprint('public', __name__)
 
 @public_bp.route('/')
 def home():
-    # active_announcements and upcoming_events are provided globally by app.py:inject_site_config
-    # polls is the only one not currently in site_config, but we can keep it here or add it there
-    from models.communication import Poll
-    polls = Poll.query.filter_by(is_active=True).order_by(Poll.created_at.desc()).limit(2).all()
+    polls = []
+    try:
+        from models.communication import Poll
+        polls = Poll.query.filter_by(is_active=True).order_by(Poll.created_at.desc()).limit(2).all()
+    except Exception:
+        pass  # Table may not exist on fresh Vercel deploy
     
     return render_template('public/home.html', polls=polls)
 
