@@ -26,7 +26,24 @@ def home():
     except Exception:
         pass  # Table may not exist on fresh Vercel deploy
     
-    return render_template('public/home.html', polls=polls)
+    try:
+        return render_template('public/home.html', polls=polls)
+    except Exception as e:
+        import os
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        
+        output = [f"<h1>Template Crash: {str(e)}</h1>"]
+        output.append(f"<p><b>Base Dir:</b> {base_dir}</p>")
+        
+        output.append("<h2>Filesystem Dump</h2><pre>")
+        for root, dirs, files in os.walk(base_dir):
+            if root.count(os.sep) - base_dir.count(os.sep) < 2:
+                output.append(f"DIR: {root}")
+                for d in dirs: output.append(f"  + {d}")
+                for f in files: output.append(f"  - {f}")
+        output.append("</pre>")
+        
+        return "".join(output)
 
 @public_bp.route('/about')
 def about():

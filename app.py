@@ -19,9 +19,13 @@ def create_app():
     base_dir = os.path.dirname(os.path.abspath(__file__))
     app = Flask(__name__, 
                 instance_path=instance_path,
-                root_path=base_dir,
-                template_folder='templates',
-                static_folder='static')
+                template_folder=os.path.join(base_dir, 'templates'),
+                static_folder=os.path.join(base_dir, 'static'))
+    
+    # ── BERSERK VERCEL FIX: Force Native Jinja FileSystemLoader ──
+    import jinja2
+    app.jinja_loader = jinja2.FileSystemLoader(os.path.join(base_dir, 'templates'))
+
     app.config.from_object(Config)
 
     # 1. Init DB
