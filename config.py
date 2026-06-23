@@ -16,4 +16,10 @@ class Config:
         _db_url = _db_url.replace('postgresql://', 'postgresql+pg8000://', 1)
 
     SQLALCHEMY_DATABASE_URI = _db_url or 'sqlite:///attendance.db'
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    
+    # Vercel Compatibility: Serverless environments are read-only.
+    # If we are on Vercel and using SQLite, we must use /tmp
+    if os.environ.get('VERCEL') == '1' and SQLALCHEMY_DATABASE_URI.startswith('sqlite:///'):
+        SQLALCHEMY_DATABASE_URI = 'sqlite:////tmp/attendance.db'
+        
+    SQLALCHEMY_TRACK_MODIFICATIONS = False

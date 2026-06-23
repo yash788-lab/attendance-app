@@ -10,7 +10,12 @@ from extensions import login_manager, migrate
 from utils.seed import register_seed_commands
 
 def create_app():
-    app = Flask(__name__)
+    # Adjust instance path for Vercel (Read-only filesystem)
+    instance_path = None
+    if os.environ.get('VERCEL') == '1':
+        instance_path = '/tmp'
+
+    app = Flask(__name__, instance_path=instance_path)
     app.config.from_object(Config)
 
     # 1. Init DB
