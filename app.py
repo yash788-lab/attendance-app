@@ -19,8 +19,9 @@ def create_app():
     base_dir = os.path.dirname(os.path.abspath(__file__))
     app = Flask(__name__, 
                 instance_path=instance_path,
-                template_folder=os.path.join(base_dir, 'templates'),
-                static_folder=os.path.join(base_dir, 'static'))
+                root_path=base_dir,
+                template_folder='templates',
+                static_folder='static')
     app.config.from_object(Config)
 
     # 1. Init DB
