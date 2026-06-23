@@ -1,17 +1,17 @@
 {
-  "functions": {
-    "api/**/*.py": {
-      "includeFiles": [
-        "templates/**/*",
-        "static/**/*",
-        "routes/**/*",
-        "models/**/*",
-        "services/**/*",
-        "utils/**/*"
-      ]
+  "builds": [
+    {
+      "src": "app.py",
+      "use": "@vercel/python",
+      "config": {
+        "includeFiles": "{templates,static,routes,models,services,utils}/**"
+      }
     }
-  },
-  "rewrites": [
-    { "source": "/(.*)", "destination": "/api/index.py" }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "app.py"
+    }
   ]
 }

@@ -2,6 +2,21 @@ from flask import Blueprint, render_template
 
 public_bp = Blueprint('public', __name__)
 
+@public_bp.route('/debug-files')
+def debug_files():
+    import os
+    results = []
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__))) # go up from routes
+    for root, dirs, files in os.walk(base_dir):
+        # only collect first 2 levels to avoid huge output
+        if root.count(os.sep) - base_dir.count(os.sep) < 2:
+            results.append(f"DIR: {root}")
+            for d in dirs:
+                results.append(f"  + {d}")
+            for f in files:
+                results.append(f"  - {f}")
+    return "<pre>" + "\n".join(results) + "</pre>"
+
 @public_bp.route('/')
 def home():
     polls = []
