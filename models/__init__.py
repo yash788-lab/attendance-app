@@ -12,6 +12,7 @@ from models.marks import Mark
 from models.homework import Homework
 from models.communication import Announcement, Event, Poll, PollOption, PollVote
 from models.notification import Notification
+from models.site_config import SiteConfig
 
 __all__ = [
     'User', 'Admin',
@@ -23,4 +24,5 @@ __all__ = [
     'Homework',
     'Announcement', 'Event', 'Poll', 'PollOption', 'PollVote',
     'Notification',
+    'SiteConfig',
 ]

@@ -18,14 +18,50 @@ class AdminService:
 
     @staticmethod
     def reject_teacher(teacher_id):
+        """Used for rejecting a NEW registration (simple delete)."""
         teacher = db.session.get(Teacher, teacher_id)
         if teacher:
             user = teacher.user
             db.session.delete(teacher)
-            db.session.delete(user)
+            if user:
+                db.session.delete(user)
             db.session.commit()
             return True
         return False
+
+    @staticmethod
+    def delete_teacher(teacher_id):
+        """Permanent removal of an APPROVED teacher with cleanup of relations."""
+        teacher = db.session.get(Teacher, teacher_id)
+        if not teacher:
+            return False, "Teacher not found"
+        
+        name = teacher.name
+        user = teacher.user
+
+        # Circular dependencies cleanup
+        from models.academic import ClassSubject
+        from models.attendance import Attendance
+        from models.marks import Mark
+        from models.homework import Homework
+        from models.communication import Announcement, Event, Poll, PollVote
+
+        ClassSubject.query.filter_by(teacher_id=teacher.id).update({ClassSubject.teacher_id: None})
+        Attendance.query.filter_by(marked_by=teacher.id).update({Attendance.marked_by: None})
+        Mark.query.filter_by(entered_by=teacher.id).update({Mark.entered_by: None})
+        Homework.query.filter_by(teacher_id=teacher.id).delete()
+
+        if user:
+            Announcement.query.filter_by(created_by=user.id).delete()
+            Event.query.filter_by(created_by=user.id).delete()
+            PollVote.query.filter_by(user_id=user.id).delete()
+            Poll.query.filter_by(created_by=user.id).delete()
+            db.session.delete(user)
+        else:
+            db.session.delete(teacher)
+
+        db.session.commit()
+        return True, name
 
     @staticmethod
     def add_student(name, father_name, class_id, roll_number, email, phone):

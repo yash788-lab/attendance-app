@@ -1,0 +1,80 @@
+<!-- templates/layouts/partials/_footer_public.html -->
+<footer class="pub-footer" style="background: #1A1A1A; color: #ffffff; padding: var(--space-20) 0 var(--space-8);">
+    <div class="container">
+        <div class="grid grid-cols-4">
+            <!-- Brand -->
+            <div class="footer-col" style="grid-column: span 1.5;">
+                <img src="{{ site_config.logo_url }}" alt="{{ site_config.school_name }}" style="height: 60px; margin-bottom: var(--space-6);">
+                <p style="font-size: var(--text-sm); opacity: 0.7; max-width: 300px; margin-bottom: var(--space-8);">
+                    {{ site_config.tagline | e }}
+                </p>
+                <div class="footer-socials" style="display: flex; gap: var(--space-4);">
+                    {% if site_config.facebook_url %}
+                    <a href="{{ site_config.facebook_url }}" aria-label="Facebook">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                    </a>
+                    {% endif %}
+                    {% if site_config.instagram_url %}
+                    <a href="{{ site_config.instagram_url }}" aria-label="Instagram">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.981 1.28.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 2.16c3.203 0 3.585.016 4.85.071 3.522.162 4.747 1.391 4.91 4.91.055 1.265.071 1.645.071 4.859 0 3.213-.016 3.593-.071 4.858-.163 3.513-1.393 4.741-4.91 4.91-1.265.056-1.644.072-4.859.072-3.213 0-3.592-.016-4.858-.071-3.514-.163-4.742-1.393-4.91-4.91-.056-1.265-.072-1.644-.072-4.859 0-3.213.016-3.592.071-4.858.163-3.513 1.393-4.741 4.91-4.91 1.265-.056 1.645-.072 4.858-.072zM12 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+                    </a>
+                    {% endif %}
+                    {% if site_config.youtube_url %}
+                    <a href="{{ site_config.youtube_url }}" aria-label="YouTube">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M23.498 6.163a2.952 2.952 0 00-2.071-2.083C19.596 3.53 12 3.53 12 3.53s-7.597 0-9.426.551a2.952 2.952 0 00-2.072 2.083C0 7.99 0 12 0 12s0 4.01.502 5.837a2.952 2.952 0 002.072 2.083c1.829.55 9.426.55 9.426.55s7.597 0 9.427-.551a2.952 2.952 0 002.071-2.083C24 16.01 24 12 24 12s0-4.01-.502-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Links -->
+            <div class="footer-col" style="grid-column: span 0.8;">
+                <h4 style="font-family: var(--font-display); font-size: var(--text-base); margin-bottom: var(--space-6);">Quick Links</h4>
+                <ul style="display: grid; gap: var(--space-3); font-size: var(--text-sm); opacity: 0.8;">
+                    <li><a href="{{ url_for('public.home') }}">Home</a></li>
+                    <li><a href="{{ url_for('public.about') }}">About Us</a></li>
+                    <li><a href="{{ url_for('public.academics') }}">Academics</a></li>
+                    <li><a href="{{ url_for('public.facilities') }}">Facilities</a></li>
+                </ul>
+            </div>
+
+            <!-- Portals -->
+            <div class="footer-col" style="grid-column: span 0.8;">
+                <h4 style="font-family: var(--font-display); font-size: var(--text-base); margin-bottom: var(--space-6);">Portals</h4>
+                <ul style="display: grid; gap: var(--space-3); font-size: var(--text-sm); opacity: 0.8;">
+                    <li><a href="{{ url_for('auth.student_login') }}">Student Portal</a></li>
+                    <li><a href="{{ url_for('auth.login') }}">Teacher Portal</a></li>
+                    <li><a href="{{ url_for('auth.admin_login') }}">Admin Portal</a></li>
+                </ul>
+            </div>
+
+            <!-- Contact -->
+            <div class="footer-col">
+                <h4 style="font-family: var(--font-display); font-size: var(--text-base); margin-bottom: var(--space-6);">Contact Info</h4>
+                <ul style="display: grid; gap: var(--space-4); font-size: var(--text-sm); opacity: 0.8;">
+                    <li style="display: flex; gap: var(--space-3);">
+                        <i data-lucide="map-pin" style="width: 18px;"></i>
+                        <span>{{ site_config.address | e }}</span>
+                    </li>
+                    <li style="display: flex; gap: var(--space-3);">
+                        <i data-lucide="phone" style="width: 18px;"></i>
+                        <span>{{ site_config.phone | e }}</span>
+                    </li>
+                    <li style="display: flex; gap: var(--space-3);">
+                        <i data-lucide="mail" style="width: 18px;"></i>
+                        <span>{{ site_config.email | e }}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Bottom -->
+        <div style="margin-top: var(--space-20); padding-top: var(--space-8); border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; font-size: var(--text-xs); opacity: 0.5;">
+            <p>&copy; {{ now.year if now else 2026 }} {{ site_config.school_name }}. All rights reserved.</p>
+            <div style="display: flex; gap: var(--space-6);">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+            </div>
+        </div>
+    </div>
+</footer>

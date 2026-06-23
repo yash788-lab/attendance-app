@@ -1,258 +1,128 @@
-{% extends 'layouts/public_base.html' %}
+{% extends 'layouts/base_public.html' %}
 
-{% block title %}School Excellence - Empowering Future Leaders{% endblock %}
+{% block title %}Welcome - {{ site_config.school_name }}{% endblock %}
 
 {% block content %}
-<!-- Hero Section -->
-<div class="relative bg-gray-900 overflow-hidden">
-    <!-- Background Image -->
-    <div class="absolute inset-0">
-        <img src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80" alt="School Campus" class="w-full h-full object-cover opacity-40">
-        <div class="absolute inset-0 bg-gradient-to-r from-gray-900 to-transparent"></div>
+<!-- SVG Clip Path Definition -->
+<svg width="0" height="0" style="position: absolute;">
+  <defs>
+    <clipPath id="hero-wave-clip" clipPathUnits="objectBoundingBox">
+      <path d="M0,0 H0.8 C0.9,0.2 0.7,0.4 0.85,0.6 C1,0.8 0.8,1 0.8,1 H0 V0"></path>
+    </clipPath>
+  </defs>
+</svg>
+
+<!-- Section 1: Hero Layer -->
+<section class="pub-hero">
+    <div class="container" style="position: relative;">
+        <!-- New Section-Wide Background Illustration -->
+        <img src="/static/css/public/illustrations/attendance-app-svg3.svg" class="hero-full-bg-illu">
+
+        <div class="hero-split">
+            <!-- Left Side: Wavy Image -->
+            <div class="wavy-image-container" data-reveal="left">
+                <img src="/static/css/public/assets/school-image.jpg" alt="School Adventure" class="wavy-image">
+                <!-- Lottie Overlay or floating element could go here -->
+            </div>
+
+            <!-- Right Side: Playful Quote -->
+            <div class="quote-container" data-reveal="right" style="text-align: center;">
+                <dotlottie-player 
+                    src="/static/css/public/assets/lottie-animation1.lottie" 
+                    background="transparent" 
+                    class="pub-lottie-scroll"
+                    autoplay loop
+                    style="width: 250px; height: 250px; margin: 0 auto;">
+                </dotlottie-player>
+                <h1 class="playful-quote">"where the adventure begins!"</h1>
+            </div>
+        </div>
+
+        <!-- Buttons Row -->
+        <div class="hero-buttons" data-reveal="up">
+            <a href="{{ url_for('public.contact') }}" class="pub-btn pub-btn--yellow">Apply Now!</a>
+            <a href="{{ url_for('public.about') }}" class="pub-btn pub-btn--yellow">Discover more</a>
+        </div>
     </div>
+</section>
+
+<!-- Section 2: Inspired Layer (2x2 Cards) -->
+<section class="section section-feature-cards" style="position: relative; overflow: hidden; background: #fff;">
+    <!-- Background image for Section 2 -->
+    <div class="section-bg-image" style="background-image: url('/static/css/public/assets/school-image3.jpg');"></div>
     
-    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32 flex flex-col justify-center min-h-[85vh]">
-        <div class="max-w-2xl">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-500/20 border border-primary-500/30 text-primary-200 text-sm font-medium mb-6">
-                <span class="w-2 h-2 rounded-full bg-primary-400 animate-pulse"></span>
-                Admissions open for 2026-27
+    <div class="container" style="position: relative; z-index: 2;">
+        <header class="pub-section-header pub-section-header--centered" data-reveal>
+            <span class="pub-section-header__eyebrow">Our Core Values</span>
+            <h2 class="pub-section-header__title">Nurturing Minds, Building Futures</h2>
+            <div class="pub-section-header__divider"></div>
+        </header>
+
+        <div class="feature-layout-stack">
+            <!-- Top Illustration (Full Row) -->
+            <div class="feature-illu-row" data-reveal="up">
+                <img src="/static/css/public/illustrations/attendance-app-svg1.svg" class="enlarged-illu">
             </div>
-            <h1 class="text-4xl md:text-5xl lg:text-6xl font-heading font-extrabold text-white tracking-tight mb-6 leading-tight">
-                Empowering <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-secondary">Future Leaders</span> for Tomorrow.
-            </h1>
-            <p class="text-lg md:text-xl text-gray-300 mb-10 max-w-xl leading-relaxed">
-                Discover a world-class educational experience combining academic excellence with state-of-the-art facilities and holistic development.
-            </p>
-            <div class="flex flex-col sm:flex-row gap-4">
-                <a href="{{ url_for('public.about') }}" class="inline-flex items-center justify-center px-8 py-4 text-base font-semibold text-white bg-primary-600 rounded-xl hover:bg-primary-500 hover:shadow-lg hover:shadow-primary-600/30 transition-all duration-200">
-                    Discover Our School
-                </a>
-                <a href="{{ url_for('public.contact') }}" class="inline-flex items-center justify-center px-8 py-4 text-base font-semibold text-white bg-white/10 border border-white/20 backdrop-blur-md rounded-xl hover:bg-white/20 transition-all duration-200">
-                    Contact Admissions
-                </a>
+
+            <!-- The Grid -->
+            <div class="feature-grid-2x2">
+                <div class="feature-card" data-reveal="up">
+                    <h3>Global Vision</h3>
+                    <p>Preparing students for a connected world through international curricula and diverse perspectives.</p>
+                </div>
+
+                <div class="feature-card" data-reveal="up">
+                    <h3>Innovative Learning</h3>
+                    <p>Empowering students with cutting-edge technology and creative problem-solving skills.</p>
+                </div>
+
+                <div class="feature-card" data-reveal="up">
+                    <h3>Holistic Growth</h3>
+                    <p>Fostering physical, emotional, and social well-being alongside academic excellence.</p>
+                </div>
+
+                <div class="feature-card" data-reveal="up">
+                    <h3>Community Spirit</h3>
+                    <p>Building strong character through collaboration, leadership, and service to others.</p>
+                </div>
+            </div>
+
+            <!-- Bottom Illustration (Full Row) -->
+            <div class="feature-illu-row" data-reveal="up" style="margin-top: var(--space-8);">
+                <img src="/static/css/public/illustrations/attendance-app-svg4.svg" class="enlarged-illu">
             </div>
         </div>
     </div>
-</div>
+</section>
 
-<!-- News & Updates Section -->
-{% if announcements or events or polls %}
-<div class="py-16 md:py-24 bg-gray-50 relative -mt-10 rounded-t-3xl z-10 shadow-xl border-b border-gray-200">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center max-w-3xl mx-auto mb-16">
-            <h2 class="text-sm font-bold text-primary-600 tracking-widest uppercase mb-3">Notice Board</h2>
-            <h3 class="text-3xl md:text-4xl font-heading font-bold text-gray-900 mb-4">Latest Updates & Events</h3>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <!-- Announcements Column -->
-            <div class="lg:col-span-2">
-                <h4 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">📣 Announcements</h4>
-                <div class="space-y-4">
-                    {% for ann in announcements %}
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border {{ 'border-yellow-400 bg-yellow-50/30' if ann.is_pinned else 'border-gray-100' }}">
-                        <div class="flex justify-between items-start mb-2">
-                            <h5 class="text-lg font-bold text-gray-900 flex items-center gap-2">
-                                {{ ann.title }}
-                                {% if ann.is_pinned %}<span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full uppercase tracking-wider font-bold">Pinned</span>{% endif %}
-                            </h5>
-                            <span class="text-sm text-gray-500 whitespace-nowrap">{{ ann.created_at.strftime('%b %d, %Y') }}</span>
-                        </div>
-                        <p class="text-gray-600 whitespace-pre-wrap">{{ ann.content }}</p>
-                    </div>
-                    {% else %}
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center text-gray-500">
-                        No recent announcements.
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-
-            <!-- Events & Polls Column -->
-            <div class="space-y-8">
-                <!-- Upcoming Events -->
-                <div>
-                    <h4 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">📅 Upcoming Events</h4>
-                    <div class="space-y-4">
-                        {% for ev in events %}
-                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex gap-4 items-start">
-                            <div class="bg-primary-50 rounded-xl p-3 text-center min-w-[60px]">
-                                <span class="block text-primary-600 font-bold text-lg leading-none">{{ ev.event_date.strftime('%d') }}</span>
-                                <span class="block text-primary-500 text-xs font-bold uppercase mt-1">{{ ev.event_date.strftime('%b') }}</span>
-                            </div>
-                            <div>
-                                <h5 class="font-bold text-gray-900">{{ ev.title }}</h5>
-                                <p class="text-sm text-gray-500 mt-1 flex items-center gap-1">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                                    {{ ev.location or 'TBA' }}
-                                </p>
-                            </div>
-                        </div>
-                        {% else %}
-                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center text-gray-500">
-                            No upcoming events.
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-
-                <!-- Polls -->
-                {% if polls %}
-                <div>
-                    <h4 class="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">📊 Community Polls</h4>
-                    <div class="space-y-4">
-                        {% for poll in polls %}
-                        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                            <h5 class="font-bold text-gray-900 mb-4">{{ poll.question }}</h5>
-                            <div class="space-y-2">
-                                {% for opt in poll.options %}
-                                <div class="w-full text-left px-4 py-2 rounded-xl bg-gray-50 border border-gray-200 text-sm font-medium text-gray-700">
-                                    {{ opt.option_text }}
-                                </div>
-                                {% endfor %}
-                            </div>
-                            <p class="text-xs text-gray-400 mt-4 text-center">Log in to vote</p>
-                        </div>
-                        {% endfor %}
-                    </div>
-                </div>
-                {% endif %}
-            </div>
-        </div>
+<!-- Section 3: Announcements -->
+<section id="announcements" class="section bg-surface-off">
+    <div class="container" style="text-align: center; padding: var(--space-20) 0;">
+        <h2 style="font-family: var(--font-script); font-size: 3rem; color: var(--color-secondary);">Announcements</h2>
+        <p style="opacity: 0.6; font-size: var(--text-lg);">Not created yet!</p>
     </div>
-</div>
-{% endif %}
+</section>
 
-<!-- Quick Highlights Section -->
-<div class="py-16 md:py-24 bg-white relative -mt-10 rounded-t-3xl z-10 shadow-xl">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center max-w-3xl mx-auto mb-16">
-            <h2 class="text-sm font-bold text-primary-600 tracking-widest uppercase mb-3">Why Choose Us</h2>
-            <h3 class="text-3xl md:text-4xl font-heading font-bold text-gray-900 mb-4">Excellence in Every Aspect</h3>
-            <p class="text-gray-600">We provide a nurturing environment where students thrive academically, physically, and emotionally.</p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <!-- Academic -->
-            <div class="bg-gray-50 rounded-2xl p-8 border border-gray-100 hover:border-primary-100 hover:shadow-xl hover:shadow-primary-500/5 transition-all duration-300 group">
-                <div class="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                    <span class="text-blue-600 text-2xl">📚</span>
-                </div>
-                <h4 class="text-xl font-heading font-bold text-gray-900 mb-3">Academic Excellence</h4>
-                <p class="text-gray-600 leading-relaxed">Rigorous curriculum designed to challenge students and prepare them for top universities worldwide.</p>
-            </div>
-            
-            <!-- Smart Classrooms -->
-            <div class="bg-gray-50 rounded-2xl p-8 border border-gray-100 hover:border-primary-100 hover:shadow-xl hover:shadow-primary-500/5 transition-all duration-300 group">
-                <div class="w-14 h-14 bg-purple-100 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                    <span class="text-purple-600 text-2xl">💻</span>
-                </div>
-                <h4 class="text-xl font-heading font-bold text-gray-900 mb-3">Smart Classrooms</h4>
-                <p class="text-gray-600 leading-relaxed">Interactive boards and digital learning tools integrated into every classroom for modern education.</p>
-            </div>
-            
-            <!-- Sports & Co-curricular -->
-            <div class="bg-gray-50 rounded-2xl p-8 border border-gray-100 hover:border-primary-100 hover:shadow-xl hover:shadow-primary-500/5 transition-all duration-300 group">
-                <div class="w-14 h-14 bg-green-100 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                    <span class="text-green-600 text-2xl">🏆</span>
-                </div>
-                <h4 class="text-xl font-heading font-bold text-gray-900 mb-3">Sports & Athletics</h4>
-                <p class="text-gray-600 leading-relaxed">State-of-the-art sports facilities promoting physical health, teamwork, and competitive spirit.</p>
-            </div>
-        </div>
+<!-- Section 4: Facilities -->
+<section id="facilities" class="section">
+    <div class="container" style="text-align: center; padding: var(--space-20) 0;">
+        <h2 style="font-family: var(--font-script); font-size: 3rem; color: var(--color-secondary);">Our Facilities</h2>
+        <p style="opacity: 0.6; font-size: var(--text-lg);">Not created yet!</p>
     </div>
-</div>
-
-<!-- Principal's Message -->
-<div class="py-20 bg-gray-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="bg-white rounded-3xl shadow-xl overflow-hidden">
-            <div class="flex flex-col md:flex-row">
-                <div class="md:w-5/12 h-64 md:h-auto relative">
-                    <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Principal" class="absolute inset-0 w-full h-full object-cover">
-                </div>
-                <div class="md:w-7/12 p-10 md:p-16 flex flex-col justify-center relative">
-                    <svg class="absolute top-8 right-8 text-gray-100 w-24 h-24" fill="currentColor" viewBox="0 0 32 32" aria-hidden="true">
-                        <path d="M9.352 4C4.456 7.456 1 13.12 1 19.36c0 5.088 3.072 8.064 6.624 8.064 3.36 0 5.856-2.688 5.856-5.856 0-3.168-2.208-5.472-5.088-5.472-.576 0-1.344.096-1.536.192.48-3.264 3.552-7.104 6.624-9.024L9.352 4zm16.512 0c-4.8 3.456-8.256 9.12-8.256 15.36 0 5.088 3.072 8.064 6.624 8.064 3.264 0 5.856-2.688 5.856-5.856 0-3.168-2.304-5.472-5.184-5.472-.576 0-1.248.096-1.44.192.48-3.264 3.456-7.104 6.528-9.024L25.864 4z" />
-                    </svg>
-                    <h2 class="text-sm font-bold text-primary-600 tracking-widest uppercase mb-3 relative z-10">From the Desk</h2>
-                    <h3 class="text-3xl font-heading font-bold text-gray-900 mb-6 relative z-10">Message from the Principal</h3>
-                    <p class="text-gray-600 text-lg leading-relaxed mb-8 relative z-10">
-                        "Education is not just about academic excellence, but about character building and holistic development. At our institution, we strive to create an environment where every student discovers their true potential and develops the skills necessary to navigate an ever-changing global landscape."
-                    </p>
-                    <div class="relative z-10">
-                        <h4 class="font-bold text-gray-900">Dr. ABC</h4>
-                        <p class="text-sm text-gray-500">Principal, KhelGaon Public School</p>
-                    </div>
-                </div>
-            </div>
-        </div>
+</section>
+<!-- Section 5: Testimonials -->
+<section id="testimonials" class="section bg-surface-off">
+    <div class="container" style="text-align: center; padding: var(--space-20) 0;">
+        <h2 style="font-family: var(--font-script); font-size: 3rem; color: var(--color-secondary);">Testimonials</h2>
+        <p style="opacity: 0.6; font-size: var(--text-lg);">Not created yet!</p>
     </div>
-</div>
+</section>
 
-<!-- Facilities / Gallery Preview -->
-<div class="py-20 bg-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex flex-col md:flex-row justify-between items-end mb-12">
-            <div class="max-w-2xl">
-                <h2 class="text-sm font-bold text-primary-600 tracking-widest uppercase mb-3">Campus Life</h2>
-                <h3 class="text-3xl md:text-4xl font-heading font-bold text-gray-900">World-Class Facilities</h3>
-            </div>
-            <a href="{{ url_for('public.facilities') }}" class="hidden md:inline-flex items-center gap-2 text-primary-600 font-medium hover:text-primary-700 transition-colors">
-                Explore all facilities
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-            </a>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div class="group relative rounded-2xl overflow-hidden aspect-[4/3] cursor-pointer">
-                <img src="https://images.unsplash.com/photo-1509062522246-3755977927d7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Classrooms" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
-                <div class="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-gray-900/20 to-transparent opacity-80 transition-opacity duration-300"></div>
-                <div class="absolute bottom-0 left-0 p-6">
-                    <h4 class="text-xl font-bold text-white mb-2">Modern Classrooms</h4>
-                    <p class="text-sm text-gray-300 opacity-0 transform translate-y-4 transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0">Tech-enabled learning spaces</p>
-                </div>
-            </div>
-
-            <div class="group relative rounded-2xl overflow-hidden aspect-[4/3] cursor-pointer">
-                <img src="https://images.unsplash.com/photo-1568667256549-094345857637?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Library" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
-                <div class="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-gray-900/20 to-transparent opacity-80 transition-opacity duration-300"></div>
-                <div class="absolute bottom-0 left-0 p-6">
-                    <h4 class="text-xl font-bold text-white mb-2">Central Library</h4>
-                    <p class="text-sm text-gray-300 opacity-0 transform translate-y-4 transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0">Over 50,000 resources and digital access</p>
-                </div>
-            </div>
-
-            <div class="group relative rounded-2xl overflow-hidden aspect-[4/3] cursor-pointer lg:col-span-1 md:col-span-2">
-                <img src="https://images.unsplash.com/photo-1461896836934-ffe607ba8211?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Sports Complex" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
-                <div class="absolute inset-0 bg-gradient-to-t from-gray-900/80 via-gray-900/20 to-transparent opacity-80 transition-opacity duration-300"></div>
-                <div class="absolute bottom-0 left-0 p-6">
-                    <h4 class="text-xl font-bold text-white mb-2">Sports Complex</h4>
-                    <p class="text-sm text-gray-300 opacity-0 transform translate-y-4 transition-all duration-300 group-hover:opacity-100 group-hover:translate-y-0">Olympic-size track and indoor courts</p>
-                </div>
-            </div>
-        </div>
-        
-        <div class="mt-8 md:hidden flex justify-center">
-            <a href="{{ url_for('public.facilities') }}" class="btn-secondary w-full">Explore all facilities</a>
-        </div>
+<!-- Section 6: Events -->
+<section id="events" class="section">
+    <div class="container" style="text-align: center; padding: var(--space-20) 0;">
+        <h2 style="font-family: var(--font-script); font-size: 3rem; color: var(--color-secondary);">Upcoming Events</h2>
+        <p style="opacity: 0.6; font-size: var(--text-lg);">Not created yet!</p>
     </div>
-</div>
-
-<!-- CTA Section -->
-<div class="bg-primary-600 relative overflow-hidden">
-    <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1519389950473-47ba0277781c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80')] bg-cover bg-center opacity-10 mix-blend-overlay"></div>
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10 text-center">
-        <h2 class="text-3xl md:text-4xl font-heading font-bold text-white mb-6">Ready to shape your child's future?</h2>
-        <p class="text-primary-100 text-lg max-w-2xl mx-auto mb-10">Join our vibrant learning community. Admissions for the upcoming academic year are now open.</p>
-        <div class="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="{{ url_for('public.contact') }}" class="inline-flex items-center justify-center px-8 py-4 text-base font-semibold text-primary-700 bg-white rounded-xl hover:bg-gray-50 transition-all duration-200">
-                Apply Now
-            </a>
-            <a href="{{ url_for('public.academics') }}" class="inline-flex items-center justify-center px-8 py-4 text-base font-semibold text-white border border-white/30 rounded-xl hover:bg-white/10 transition-all duration-200">
-                View Curriculum
-            </a>
-        </div>
-    </div>
-</div>
+</section>
 {% endblock %}

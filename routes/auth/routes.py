@@ -6,19 +6,7 @@ from models.admin import Admin
 from models.teacher import Teacher
 from database import db
 from . import auth_bp
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# SHARED AUTH HELPER
-# ─────────────────────────────────────────────────────────────────────────────
-def _authenticate(email, password):
-    """Return (user, error_message). user is None on failure."""
-    user = User.query.filter_by(email=email.strip().lower()).first()
-    if not user or not user.check_password(password):
-        return None, 'Invalid email or password.'
-    if not user.is_active:
-        return None, 'Your account is inactive. Please contact the admin.'
-    return user, None
+from services.auth_service import AuthService
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -38,7 +26,7 @@ def admin_login():
         email    = request.form.get('email', '')
         password = request.form.get('password', '')
 
-        user, err = _authenticate(email, password)
+        user, err = AuthService.authenticate(email, password)
         if err:
             flash(err, 'error')
             return render_template('auth/admin_login.html')
@@ -70,7 +58,7 @@ def student_login():
         email    = request.form.get('email', '')
         password = request.form.get('password', '')
 
-        user, err = _authenticate(email, password)
+        user, err = AuthService.authenticate(email, password)
         if err:
             flash(err, 'error')
             return render_template('auth/student_login.html')
@@ -107,7 +95,7 @@ def login():
         email    = request.form.get('email', '')
         password = request.form.get('password', '')
 
-        user, err = _authenticate(email, password)
+        user, err = AuthService.authenticate(email, password)
         if err:
             flash(err, 'error')
             return render_template('auth/login.html')
@@ -175,15 +163,11 @@ def teacher_register():
             return render_template('auth/teacher_register.html',
                                    name=name, email=email, phone=phone)
 
-        # Create User (inactive until approved)
-        user = User(email=email, role='teacher', is_active=False)
-        user.set_password(password)
-        db.session.add(user)
-        db.session.flush()
-
-        teacher = Teacher(user_id=user.id, name=name, phone=phone, is_approved=False)
-        db.session.add(teacher)
-        db.session.commit()
+        user, err = AuthService.register_teacher(name, email, phone, password)
+        if err:
+            flash(err, 'error')
+            return render_template('auth/teacher_register.html',
+                                   name=name, email=email, phone=phone)
 
         flash('Registration submitted! You will be able to log in once approved by the admin.', 'success')
         return redirect(url_for('auth.login'))

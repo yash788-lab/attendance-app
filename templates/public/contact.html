@@ -1,35 +1,92 @@
-{% extends 'layouts/public_base.html' %}
-{% block title %}Contact Us - School Excellence{% endblock %}
+{% extends 'layouts/base_public.html' %}
+
+{% block title %}Contact Admissions - {{ site_config.school_name }}{% endblock %}
+
 {% block content %}
-<div class="py-20 bg-white">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="max-w-3xl mx-auto text-center mb-16">
-            <h1 class="text-4xl font-heading font-bold text-gray-900 mb-6">Contact Admissions</h1>
-            <p class="text-lg text-gray-600">Have questions about enrollment, curriculum, or campus life? We'd love to hear from you. Send us a message and we'll get back to you as soon as possible.</p>
-        </div>
-        <div class="max-w-2xl mx-auto bg-gray-50 p-8 rounded-2xl border border-gray-100 shadow-sm">
-            <form action="#" method="POST" class="space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <label for="name" class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
-                        <input type="text" id="name" name="name" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all">
+<section class="section" style="min-height: 80vh; position: relative; overflow: hidden; background: var(--color-surface-off);">
+    <!-- Background Decoration -->
+    <div class="section-bg-image" style="background-image: url('/static/css/public/assets/school-image3.jpg'); opacity: 0.2; filter: blur(8px);"></div>
+    <img src="/static/css/public/illustrations/attendance-app-svg2.svg" style="position: absolute; top: -100px; right: -100px; width: 400px; opacity: 0.1; filter: blur(2px);">
+    <img src="/static/css/public/illustrations/attendance-app-svg3.svg" style="position: absolute; bottom: -50px; left: -50px; width: 300px; opacity: 0.1; filter: blur(2px);">
+
+    <div class="container" style="position: relative; z-index: 2;">
+        <div class="grid grid-cols-1 lg:grid-cols-2" style="gap: var(--space-20); align-items: flex-start;">
+            
+            <!-- Info Column -->
+            <div data-reveal="left">
+                <header class="pub-section-header">
+                    <span class="pub-section-header__eyebrow">Get in Touch</span>
+                    <h1 class="pub-section-header__title" style="font-family: var(--font-script); font-size: 3.5rem;">Join the Adventure!</h1>
+                </header>
+                <p style="margin-bottom: var(--space-12); font-size: var(--text-lg); line-height: 1.8; color: var(--color-text-secondary);">
+                    Have questions about enrollment, curriculum, or campus life? We'd love to hear from you. Our admissions team is ready to guide you through every step of the journey.
+                </p>
+
+                <div class="feature-layout-stack" style="gap: var(--space-4);">
+                    <div class="feature-card" style="padding: var(--space-6); display: flex; align-items: center; gap: var(--space-4); background: var(--color-surface);">
+                        <div style="width: 48px; height: 48px; background: var(--color-primary-light); color: var(--color-primary); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                            <i data-lucide="phone" style="width: 20px;"></i>
+                        </div>
+                        <div>
+                            <h4 style="font-weight: 700; font-size: var(--text-base);">Call Us</h4>
+                            <p style="font-size: var(--text-sm); opacity: 0.7;">{{ site_config.phone }}</p>
+                        </div>
                     </div>
-                    <div>
-                        <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
-                        <input type="email" id="email" name="email" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all">
+
+                    <div class="feature-card" style="padding: var(--space-6); display: flex; align-items: center; gap: var(--space-4); background: var(--color-surface);">
+                        <div style="width: 48px; height: 48px; background: var(--color-secondary-light); color: var(--color-secondary); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                            <i data-lucide="mail" style="width: 20px;"></i>
+                        </div>
+                        <div>
+                            <h4 style="font-weight: 700; font-size: var(--text-base);">Email Admissions</h4>
+                            <p style="font-size: var(--text-sm); opacity: 0.7;">{{ site_config.email }}</p>
+                        </div>
+                    </div>
+
+                    <div class="feature-card" style="padding: var(--space-6); display: flex; align-items: center; gap: var(--space-4); background: var(--color-surface);">
+                        <div style="width: 48px; height: 48px; background: #e0f2fe; color: #0ea5e9; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                            <i data-lucide="map-pin" style="width: 20px;"></i>
+                        </div>
+                        <div>
+                            <h4 style="font-weight: 700; font-size: var(--text-base);">Visit Campus</h4>
+                            <p style="font-size: var(--text-sm); opacity: 0.7;">{{ site_config.address }}</p>
+                        </div>
                     </div>
                 </div>
-                <div>
-                    <label for="subject" class="block text-sm font-medium text-gray-700 mb-2">Subject</label>
-                    <input type="text" id="subject" name="subject" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all">
+            </div>
+
+            <!-- Form Column -->
+            <div data-reveal="right">
+                <div class="feature-card" style="background: var(--color-surface); padding: var(--space-12); box-shadow: var(--shadow-2xl);">
+                    <h3 style="font-family: var(--font-script); font-size: 2.2rem; margin-bottom: var(--space-8); color: var(--color-secondary);">Send us a Message</h3>
+                    <form action="#" method="POST" class="space-y-6" style="display: flex; flex-direction: column; gap: var(--space-6);">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-6);">
+                            <div class="form-group">
+                                <label style="font-size: var(--text-sm); font-weight: 700; margin-bottom: 8px; display: block; filter: grayscale(1);">Full Name</label>
+                                <input type="text" style="width: 100%; padding: 12px 16px; border-radius: var(--radius-lg); border: 1.5px solid var(--color-border); background: var(--color-surface-off); color: var(--color-text-primary); outline: none;">
+                            </div>
+                            <div class="form-group">
+                                <label style="font-size: var(--text-sm); font-weight: 700; margin-bottom: 8px; display: block; filter: grayscale(1);">Email</label>
+                                <input type="email" style="width: 100%; padding: 12px 16px; border-radius: var(--radius-lg); border: 1.5px solid var(--color-border); background: var(--color-surface-off); color: var(--color-text-primary); outline: none;">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label style="font-size: var(--text-sm); font-weight: 700; margin-bottom: 8px; display: block; filter: grayscale(1);">Subject</label>
+                            <input type="text" style="width: 100%; padding: 12px 16px; border-radius: var(--radius-lg); border: 1.5px solid var(--color-border); background: var(--color-surface-off); color: var(--color-text-primary); outline: none;" placeholder="Admissions Inquiry">
+                        </div>
+                        <div class="form-group">
+                            <label style="font-size: var(--text-sm); font-weight: 700; margin-bottom: 8px; display: block; filter: grayscale(1);">Message</label>
+                            <textarea rows="4" style="width: 100%; padding: 12px 16px; border-radius: var(--radius-lg); border: 1.5px solid var(--color-border); background: var(--color-surface-off); color: var(--color-text-primary); outline: none; resize: none;" placeholder="Type your message here..."></textarea>
+                        </div>
+                        <button type="submit" class="pub-btn pub-btn--yellow" style="width: 100%; justify-content: center; padding: 1.2rem; margin-top: var(--space-4);">
+                            SEND MESSAGE
+                            <i data-lucide="send" style="width: 18px; margin-left: 8px;"></i>
+                        </button>
+                    </form>
                 </div>
-                <div>
-                    <label for="message" class="block text-sm font-medium text-gray-700 mb-2">Message</label>
-                    <textarea id="message" name="message" rows="5" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 outline-none transition-all"></textarea>
-                </div>
-                <button type="submit" class="w-full btn-primary">Send Message</button>
-            </form>
+            </div>
+
         </div>
     </div>
-</div>
+</section>
 {% endblock %}

@@ -1,0 +1,18 @@
+<!-- templates/layouts/partials/_announcement_ticker.html -->
+{% if site_config.active_announcements %}
+<div class="pub-ticker">
+    <div class="pub-ticker__track">
+        {% for ann in site_config.active_announcements %}
+            <span class="pub-ticker__item {% if ann.is_pinned %}pub-ticker__item--urgent{% endif %}">
+                {{ ann.title | e }} • 
+            </span>
+        {% endfor %}
+        <!-- Duplicate for seamless loop -->
+        {% for ann in site_config.active_announcements %}
+            <span class="pub-ticker__item {% if ann.is_pinned %}pub-ticker__item--urgent{% endif %}">
+                {{ ann.title | e }} • 
+            </span>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}

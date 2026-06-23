@@ -2,13 +2,13 @@ from flask import render_template, request, redirect, url_for, flash
 from flask_login import login_required
 
 from models.user import User
-from models.admin import Admin
 from models.teacher import Teacher
 from models.student import Student
 from models.academic import Class, Subject, Exam
 from database import db
 from . import admin_bp
 from utils.decorators import admin_required
+from services.admin_service import AdminService
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -55,14 +55,11 @@ def admin_teachers():
 @login_required
 @admin_required
 def approve_teacher(teacher_id):
-    teacher = db.session.get(Teacher, teacher_id)
-    if not teacher:
+    success, teacher = AdminService.approve_teacher(teacher_id)
+    if success:
+        flash(f'{teacher.name} has been approved and can now log in.', 'success')
+    else:
         flash('Teacher not found.', 'error')
-        return redirect(url_for('admin.admin_teachers'))
-    teacher.is_approved = True
-    teacher.user.is_active = True
-    db.session.commit()
-    flash(f'{teacher.name} has been approved and can now log in.', 'success')
     return redirect(url_for('admin.admin_teachers'))
 
 
@@ -70,15 +67,10 @@ def approve_teacher(teacher_id):
 @login_required
 @admin_required
 def reject_teacher(teacher_id):
-    teacher = db.session.get(Teacher, teacher_id)
-    if not teacher:
+    if AdminService.reject_teacher(teacher_id):
+        flash('Teacher registration rejected and removed.', 'info')
+    else:
         flash('Teacher not found.', 'error')
-        return redirect(url_for('admin.admin_teachers'))
-    user = teacher.user
-    db.session.delete(teacher)
-    db.session.delete(user)
-    db.session.commit()
-    flash('Teacher registration rejected and removed.', 'info')
     return redirect(url_for('admin.admin_teachers'))
 
 
@@ -86,36 +78,11 @@ def reject_teacher(teacher_id):
 @login_required
 @admin_required
 def admin_delete_teacher(teacher_id):
-    teacher = db.session.get(Teacher, teacher_id)
-    if not teacher:
-        flash('Teacher not found.', 'error')
-        return redirect(url_for('admin.admin_teachers'))
-    name = teacher.name
-    user = teacher.user
-
-    # Clean up assignments, attendance marked reference, marks entered reference, and homework
-    from models.academic import ClassSubject
-    from models.attendance import Attendance
-    from models.marks import Mark
-    from models.homework import Homework
-    from models.communication import Announcement, Event, Poll, PollVote
-
-    ClassSubject.query.filter_by(teacher_id=teacher.id).update({ClassSubject.teacher_id: None})
-    Attendance.query.filter_by(marked_by=teacher.id).update({Attendance.marked_by: None})
-    Mark.query.filter_by(entered_by=teacher.id).update({Mark.entered_by: None})
-    Homework.query.filter_by(teacher_id=teacher.id).delete()
-
-    if user:
-        Announcement.query.filter_by(created_by=user.id).delete()
-        Event.query.filter_by(created_by=user.id).delete()
-        PollVote.query.filter_by(user_id=user.id).delete()
-        Poll.query.filter_by(created_by=user.id).delete()
-        db.session.delete(user)
+    success, result = AdminService.delete_teacher(teacher_id)
+    if success:
+        flash(f'Teacher {result} has been permanently removed.', 'success')
     else:
-        db.session.delete(teacher)
-
-    db.session.commit()
-    flash(f'Teacher {name} has been permanently removed.', 'success')
+        flash(result, 'error')
     return redirect(url_for('admin.admin_teachers'))
 
 
@@ -149,27 +116,10 @@ def admin_add_student():
         email = request.form.get('email', '').strip().lower()
         phone = request.form.get('phone', '').strip()
 
-        # Create Student record
-        student = Student(
+        AdminService.add_student(
             name=name, father_name=father_name, class_id=class_id,
             roll_number=roll_number, email=email, phone=phone
         )
-        db.session.add(student)
-        db.session.flush()
-
-        # Auto-create User account (password = roll_number), or link existing one
-        existing_user = User.query.filter_by(email=email).first()
-        if existing_user:
-            # Link student to the already-existing user account
-            student.user_id = existing_user.id
-        else:
-            user = User(email=email, role='student', is_active=True, must_change_password=True)
-            user.set_password(roll_number)
-            db.session.add(user)
-            db.session.flush()
-            student.user_id = user.id
-
-        db.session.commit()
         flash(f'Student {name} added. Default password is their roll number.', 'success')
         return redirect(url_for('admin.admin_students'))
 
@@ -180,15 +130,11 @@ def admin_add_student():
 @login_required
 @admin_required
 def admin_delete_student(student_id):
-    student = db.session.get(Student, student_id)
-    if not student:
+    success, name = AdminService.delete_student(student_id)
+    if success:
+        flash(f'Student {name} deleted.', 'success')
+    else:
         flash('Student not found.', 'error')
-        return redirect(url_for('admin.admin_students'))
-    name = student.name
-    # Cascade deletes attendance + marks via relationship
-    db.session.delete(student)
-    db.session.commit()
-    flash(f'Student {name} deleted.', 'success')
     return redirect(url_for('admin.admin_students'))
 
 
@@ -210,12 +156,10 @@ def admin_add_class():
     name = request.form.get('name', '').strip()
     academic_year = request.form.get('academic_year', '2025-26').strip()
     if name:
-        if Class.query.filter_by(name=name).first():
-            flash(f'Class "{name}" already exists.', 'error')
-        else:
-            db.session.add(Class(name=name, academic_year=academic_year))
-            db.session.commit()
+        if AdminService.add_class(name, academic_year):
             flash(f'Class "{name}" added.', 'success')
+        else:
+            flash(f'Class "{name}" already exists.', 'error')
     return redirect(url_for('admin.admin_classes'))
 
 
@@ -263,8 +207,7 @@ def admin_add_subject():
     name = request.form.get('name', '').strip()
     code = request.form.get('code', '').strip().upper() or None
     if name:
-        db.session.add(Subject(name=name, code=code))
-        db.session.commit()
+        AdminService.add_subject(name, code)
         flash(f'Subject "{name}" added.', 'success')
     return redirect(url_for('admin.admin_subjects'))
 
@@ -284,7 +227,6 @@ def admin_add_exam():
     name = request.form.get('name', '').strip()
     term = request.form.get('term', '2025-26').strip()
     if name and term:
-        db.session.add(Exam(name=name, term=term))
-        db.session.commit()
+        AdminService.add_exam(name, term)
         flash(f'Exam "{name}" added.', 'success')
     return redirect(url_for('admin.admin_exams'))

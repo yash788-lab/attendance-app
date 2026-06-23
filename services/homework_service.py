@@ -48,6 +48,27 @@ class HomeworkService:
         )
 
     @staticmethod
+    def delete(hw_id):
+        """Delete homework by ID."""
+        hw = db.session.get(Homework, hw_id)
+        if hw:
+            db.session.delete(hw)
+            db.session.commit()
+            return True
+        return False
+
+    @staticmethod
+    def get_all_active():
+        """Return all active homework across all classes."""
+        cutoff = datetime.utcnow() - timedelta(days=7)
+        return (
+            Homework.query
+            .filter(Homework.created_at >= cutoff)
+            .order_by(Homework.created_at.desc())
+            .all()
+        )
+
+    @staticmethod
     def purge_old():
         """Delete homework older than 7 days. Call from a CLI command or scheduled task."""
         cutoff = datetime.utcnow() - timedelta(days=7)

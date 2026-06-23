@@ -1,0 +1,12 @@
+<!-- templates/layouts/partials/_floating_actions.html -->
+<!-- Apply Now Sidebar -->
+<a href="{{ url_for('public.contact') }}" class="pub-apply-now">
+    APPLY FOR ADMISSION 2026-27
+</a>
+
+<!-- WhatsApp FAB -->
+{% if site_config.whatsapp_number %}
+<a href="https://wa.me/{{ site_config.whatsapp_number }}" class="pub-fab pub-fab--whatsapp animate-pulse-ring" target="_blank" rel="noopener" aria-label="Chat on WhatsApp">
+    <i data-lucide="message-circle"></i>
+</a>
+{% endif %}

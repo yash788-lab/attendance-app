@@ -1,0 +1,104 @@
+<nav id="pub-nav-overlay" class="pub-nav-overlay" aria-hidden="true">
+  <!-- Top Left Close Control -->
+  <div class="pub-nav-overlay__header" style="position: absolute; top: var(--space-8); left: var(--space-8); z-index: 1010;">
+    <button class="pub-nav-overlay__close-btn" aria-label="Close Menu" style="background: none; border: none; cursor: pointer; padding: 10px;">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-secondary);"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+    </button>
+  </div>
+
+  <ul class="pub-nav-overlay__list">
+    <li class="pub-nav-overlay__item" style="--delay: 0ms"><a class="pub-nav-overlay__link" href="{{ url_for('public.home') }}">Home</a></li>
+    <li class="pub-nav-overlay__item" style="--delay: 20ms"><a class="pub-nav-overlay__link" href="{{ url_for('public.home', _anchor='announcements') }}">Announcements</a></li>
+    <li class="pub-nav-overlay__item" style="--delay: 40ms"><a class="pub-nav-overlay__link" href="{{ url_for('public.about') }}">About Us</a></li>
+    <li class="pub-nav-overlay__item" style="--delay: 80ms"><a class="pub-nav-overlay__link" href="{{ url_for('public.academics') }}">Academics</a></li>
+    <li class="pub-nav-overlay__item" style="--delay: 120ms"><a class="pub-nav-overlay__link" href="{{ url_for('public.facilities') }}">Facilities</a></li>
+    <li class="pub-nav-overlay__item" style="--delay: 160ms"><a class="pub-nav-overlay__link" href="{{ url_for('public.about') }}">Faculty</a></li>
+    <li class="pub-nav-overlay__item" style="--delay: 200ms"><a class="pub-nav-overlay__link" href="{{ url_for('public.home', _anchor='testimonials') }}">Testimonials</a></li>
+    <li class="pub-nav-overlay__item" style="--delay: 240ms"><a class="pub-nav-overlay__link" href="{{ url_for('public.home', _anchor='events') }}">Events</a></li>
+    <li class="pub-nav-overlay__item" style="--delay: 280ms"><a class="pub-nav-overlay__link" href="{{ url_for('public.contact') }}">Admission Zone</a></li>
+    <li class="pub-nav-overlay__item" style="--delay: 320ms"><a class="pub-nav-overlay__link" href="{{ url_for('public.about') }}">School Information</a></li>
+    <li class="pub-nav-overlay__item" style="--delay: 360ms"><a class="pub-nav-overlay__link" href="{{ url_for('public.gallery') }}">Gallery</a></li>
+
+    <!-- Login Portal: Matching main link style -->
+    <li class="pub-nav-overlay__item pub-nav-overlay__dropdown" style="--delay: 400ms; flex-direction: column; align-items: flex-end;">
+      <div class="pub-nav-overlay__link pub-nav-overlay__dropdown-trigger" style="display: flex; align-items: center; justify-content: flex-end; gap: var(--space-2); cursor: pointer; border: none; background: none; width: auto; padding: 0;">
+        Login Portal <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="dropdown-icon-chevron"><polyline points="6 9 12 15 18 9"></polyline></svg>
+      </div>
+      <ul class="pub-nav-overlay__sublist" style="text-align: right; padding-right: 0;">
+        <li><a href="{{ url_for('auth.student_login') }}">Student Portal</a></li>
+        <li><a href="{{ url_for('auth.login') }}">Teacher Portal</a></li>
+        <li><a href="{{ url_for('auth.admin_login') }}">Admin Portal</a></li>
+      </ul>
+    </li>
+
+    <li class="pub-nav-overlay__item" style="--delay: 440ms"><a class="pub-nav-overlay__link" href="{{ url_for('public.contact_info') }}">Contact Info</a></li>
+  </ul>
+</nav>
+
+<style>
+.pub-header__icon-btn {
+    width: 48px;
+    height: 48px;
+    background: var(--color-surface-off);
+    color: var(--color-secondary);
+    border: none;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.pub-header__icon-btn:hover {
+    background: var(--color-primary);
+    transform: perspective(1px) scale(1.05);
+}
+
+.pub-nav-overlay__sublist {
+    list-style: none;
+    padding: 0;
+    display: none;
+    flex-direction: column;
+    gap: var(--space-4);
+    margin: var(--space-4) 0;
+    width: 100%;
+}
+
+.pub-nav-overlay__dropdown.is-open .pub-nav-overlay__sublist {
+    display: flex;
+}
+
+.pub-nav-overlay__sublist a {
+    font-size: var(--text-lg);
+    text-decoration: none;
+    color: var(--color-secondary);
+    opacity: 0.6;
+    transition: opacity 300ms;
+}
+
+.pub-nav-overlay__sublist a:hover {
+    opacity: 1;
+}
+
+.dropdown-icon-chevron {
+    transition: transform 0.3s ease;
+}
+
+.pub-nav-overlay__dropdown.is-open .dropdown-icon-chevron {
+    transform: rotate(180deg);
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const trigger = document.querySelector('.pub-nav-overlay__dropdown-trigger');
+    const dropdown = document.querySelector('.pub-nav-overlay__dropdown');
+    
+    if (trigger && dropdown) {
+        trigger.addEventListener('click', (e) => {
+            dropdown.classList.toggle('is-open');
+        });
+    }
+});
+</script>

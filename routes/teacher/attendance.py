@@ -9,6 +9,7 @@ from models.academic import Class
 from database import db
 from . import teacher_bp
 from utils.decorators import admin_or_teacher_required, student_required
+from services.attendance_service import AttendanceService
 
 
 @teacher_bp.route('/attendance/mark', methods=['GET', 'POST'])
@@ -43,33 +44,16 @@ def mark_attendance():
             existing_attendance[s.id] = record
 
     if request.method == 'POST':
-        # Determine teacher_id if current user is a teacher
-        teacher_id = None
-        if current_user.role == 'teacher' and current_user.teacher_profile:
-            teacher_id = current_user.teacher_profile.id
-
+        teacher_id = current_user.teacher_profile.id if current_user.role == 'teacher' else None
+        
+        attendance_map = {}
         for s in students:
             status = request.form.get(f'status_{s.id}')
             remarks = request.form.get(f'remarks_{s.id}', '')
-            if status:
-                existing = Attendance.query.filter_by(
-                    student_id=s.id, date=selected_date
-                ).first()
-                if existing:
-                    existing.status = status
-                    existing.remarks = remarks
-                    if teacher_id:
-                        existing.marked_by = teacher_id
-                else:
-                    db.session.add(Attendance(
-                        student_id=s.id,
-                        date=selected_date,
-                        status=status,
-                        remarks=remarks,
-                        marked_by=teacher_id,
-                    ))
-
-        db.session.commit()
+            attendance_map[s.id] = (status, remarks)
+            
+        AttendanceService.save_attendance(attendance_map, selected_date, teacher_id)
+        
         flash('Attendance saved successfully!', 'success')
         return redirect(url_for('teacher.mark_attendance',
                                 date=selected_date.strftime('%Y-%m-%d'),

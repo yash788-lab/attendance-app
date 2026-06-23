@@ -18,17 +18,7 @@ def manage_homework():
     teacher_id = teacher.id if teacher else None
 
     if current_user.role == 'admin':
-        # Admin sees all active homework
-        from datetime import timedelta
-        from models.homework import Homework
-        from database import db
-        cutoff = datetime.utcnow() - timedelta(days=7)
-        homework_list = (
-            Homework.query
-            .filter(Homework.created_at >= cutoff)
-            .order_by(Homework.created_at.desc())
-            .all()
-        )
+        homework_list = HomeworkService.get_all_active()
     else:
         homework_list = HomeworkService.get_for_teacher(teacher_id)
 
@@ -96,9 +86,9 @@ def assign_homework():
 @admin_or_teacher_required
 def delete_homework(hw_id):
     """Delete a homework assignment (teacher who created it, or admin)."""
+    # Quick check for ownership
     from models.homework import Homework
-    from database import db
-    hw = db.session.get(Homework, hw_id)
+    hw = Homework.query.get(hw_id)
     if not hw:
         flash('Homework not found.', 'error')
         return redirect(url_for('teacher.manage_homework'))
@@ -108,7 +98,6 @@ def delete_homework(hw_id):
         flash('You can only delete your own homework assignments.', 'error')
         return redirect(url_for('teacher.manage_homework'))
 
-    db.session.delete(hw)
-    db.session.commit()
+    HomeworkService.delete(hw_id)
     flash('Homework deleted.', 'success')
     return redirect(url_for('teacher.manage_homework'))

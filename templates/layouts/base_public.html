@@ -1,0 +1,96 @@
+<!-- templates/layouts/base_public.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="School Excellence - Modern Education">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800;900&family=Nunito:wght@400;600;700&family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- CSS Assets -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/public/base.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/public/layout.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/public/navigation.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/public/components.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/public/animations.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/public/home.css') }}">
+    
+    {% block extra_css %}{% endblock %}
+
+    <title>{% block title %}{{ site_config.school_name }}{% endblock %}</title>
+</head>
+<body class="context-public">
+    <div class="page-wrapper">
+        <!-- Floating Actions (Home Only) -->
+        {% if request.endpoint == 'public.home' %}
+            {% include 'layouts/partials/_floating_actions.html' %}
+        {% endif %}
+
+        <!-- Navigation Overlay -->
+        {% include 'layouts/partials/_nav_public.html' %}
+
+        <!-- Header / Navbar Trigger -->
+        <header class="pub-header">
+            <a href="{{ url_for('public.home') }}" class="pub-header__brand">
+                <img src="{{ site_config.logo_url }}" alt="{{ site_config.school_name }}" class="pub-header__logo">
+            </a>
+            
+            <div style="display: flex; gap: var(--space-4); align-items: center;">
+                <!-- Dark Mode Toggle -->
+                <button id="dark-mode-toggle" class="pub-header__icon-btn" aria-label="Toggle Dark Mode">
+                    <i data-lucide="moon" id="dark-mode-icon"></i>
+                </button>
+
+                <button class="pub-nav-toggle pub-nav-toggle--menu" aria-label="Open navigation" aria-expanded="false" aria-controls="pub-nav-overlay">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Flash Messages -->
+        <div class="shared-flash-container">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% for category, message in messages %}
+                    <div class="shared-flash shared-flash--{{ category }}" role="alert">
+                        <span>{{ message }}</span>
+                        <button class="shared-flash__dismiss" onclick="this.parentElement.style.display='none'">&times;</button>
+                    </div>
+                {% endfor %}
+            {% endwith %}
+        </div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            {% block content %}{% endblock %}
+        </main>
+
+        <!-- Footer -->
+        {% include 'layouts/partials/_footer_public.html' %}
+    </div>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+      lucide.createIcons();
+    </script>
+    
+    <!-- Lottie & dotLottie Player -->
+    <script src="https://unpkg.com/@dotlottie/player-component@latest/dist/dotlottie-player.mjs" type="module"></script>
+    
+    <!-- Simple Icons for Brands -->
+    <script src="https://cdn.jsdelivr.net/npm/simple-icons@v9/index.min.js"></script>
+
+    <script src="{{ url_for('static', filename='js/public/nav.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/public/scroll-reveal.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/public/keyword-cycler.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/public/stats-counter.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/public/testimonials.js') }}"></script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

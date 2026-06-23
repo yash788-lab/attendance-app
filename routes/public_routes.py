@@ -1,19 +1,15 @@
 from flask import Blueprint, render_template
-from services.communication_service import CommunicationService
-from models.communication import Poll
 
 public_bp = Blueprint('public', __name__)
 
 @public_bp.route('/')
 def home():
-    announcements = CommunicationService.get_public_announcements(limit=5)
-    events = CommunicationService.get_upcoming_events(limit=4)
+    # active_announcements and upcoming_events are provided globally by app.py:inject_site_config
+    # polls is the only one not currently in site_config, but we can keep it here or add it there
+    from models.communication import Poll
     polls = Poll.query.filter_by(is_active=True).order_by(Poll.created_at.desc()).limit(2).all()
     
-    return render_template('public/home.html', 
-                           announcements=announcements, 
-                           events=events,
-                           polls=polls)
+    return render_template('public/home.html', polls=polls)
 
 @public_bp.route('/about')
 def about():
@@ -34,5 +30,9 @@ def gallery():
 @public_bp.route('/contact')
 def contact():
     return render_template('public/contact.html')
+
+@public_bp.route('/contact-info')
+def contact_info():
+    return render_template('public/contact_info.html')
 
 # We can also add dynamic routes for announcements and events later if needed

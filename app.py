@@ -65,6 +65,50 @@ def create_app():
                 data['pending_teachers_count'] = Teacher.query.filter_by(is_approved=False).count()
         return data
 
+    @app.context_processor
+    def inject_site_config():
+        """Inject site-wide config into every Jinja2 template."""
+        from models.site_config import SiteConfig
+        from models.communication import Announcement, Event
+        from datetime import datetime
+
+        config = SiteConfig.get_all_as_dict()
+        
+        # Provide defaults so templates never break on missing keys
+        defaults = {
+            'school_name': 'Our School',
+            'tagline': 'The Journey to Learning Begins Now',
+            'hero_image_url': 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?q=80&w=2070',
+            'primary_color': '#D4C000',
+            'secondary_color': '#4A1D96',
+            'phone': '+91 0123456789',
+            'email': 'admissions@school.edu',
+            'address': 'Rajiv Chowk, Central Delhi, 110001',
+            'whatsapp_number': '0123456789',
+            'facebook_url': 'https://facebook.com',
+            'instagram_url': 'https://instagram.com',
+            'youtube_url': 'https://youtube.com',
+            'welcome_text': 'Nurturing excellence through modern education and state-of-the-art facilities.',
+            'stats_years': '15',
+            'stats_students': '2500',
+            'stats_teachers': '120',
+            'stats_awards': '45',
+            'logo_url': 'https://img.icons8.com/bubbles/100/graduation-cap.png',
+        }
+        defaults.update(config)
+        
+        # Inject live data
+        defaults['active_announcements'] = Announcement.query.filter_by(
+            target_role='all'
+        ).order_by(Announcement.is_pinned.desc(), Announcement.created_at.desc()).limit(10).all()
+        
+        today = datetime.utcnow().date()
+        defaults['upcoming_events'] = Event.query.filter(
+            Event.event_date >= today
+        ).order_by(Event.event_date).limit(4).all()
+        
+        return dict(site_config=defaults)
+
     # 5. Register Blueprints
     from routes.auth import auth_bp
     app.register_blueprint(auth_bp)
