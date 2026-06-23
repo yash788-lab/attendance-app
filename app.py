@@ -15,7 +15,12 @@ def create_app():
     if os.environ.get('VERCEL') == '1':
         instance_path = '/tmp'
 
-    app = Flask(__name__, instance_path=instance_path)
+    # Make paths absolute for Vercel Serverless environment
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    app = Flask(__name__, 
+                instance_path=instance_path,
+                template_folder=os.path.join(base_dir, 'templates'),
+                static_folder=os.path.join(base_dir, 'static'))
     app.config.from_object(Config)
 
     # 1. Init DB
